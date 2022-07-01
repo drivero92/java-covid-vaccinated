@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import org.springframework.lang.NonNull;
 
 /**
@@ -23,19 +24,19 @@ public class Vaccine {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NonNull
     private Integer id;
     
-    @NotBlank
-    @NotEmpty(message = "Vaccine name cannot be empty or null")
+    @NotBlank(message = "El nombre de la vacuna no debe estar en blanco")
+    @NotEmpty(message = "El nombre de la vacuna no debe estar vacía")
     private String name;
 
-    @NonNull
+    @NotNull(message = "La cantidad de la vacuna no debe estar vacía")
     private Integer quantity;
     
-    @NonNull
-    private Short days;
+    @NotNull(message = "Los dias de descanso de la vacuna no debe estar vacía")
+    private Short restDays;
     
+    @NotNull(message = "El numero de dosis para completar la vacuna no debe estar vacía")
     private Byte completeDose;
     
     //private VaccineList compatibleVaccines;
@@ -46,14 +47,14 @@ public class Vaccine {
     public Vaccine(String name, Integer quantity, Short days, Byte completeDose) {
         this.name = name;
         this.quantity = quantity;
-        this.days = days;
+        this.restDays = days;
         this.completeDose = completeDose;
     }
     
-//    public Vaccine(String name, Integer quantity, Short days, Byte completeDose, VaccineList compatibleVaccines) {
+//    public Vaccine(String name, Integer quantity, Short restDays, Byte completeDose, VaccineList compatibleVaccines) {
 //        this.name = name;
 //        this.quantity = quantity;
-//        this.days = days;
+//        this.restDays = restDays;
 //        this.completeDose = completeDose;
 //        this.compatibleVaccines = compatibleVaccines;
 //    }
@@ -82,12 +83,12 @@ public class Vaccine {
         this.quantity = quantity;
     }
 
-    public Short getDays() {
-        return days;
+    public Short getRestDays() {
+        return restDays;
     }
 
-    public void setDays(Short days) {
-        this.days = days;
+    public void setRestDays(Short restDays) {
+        this.restDays = restDays;
     }
 
     public Byte getCompleteDose() {

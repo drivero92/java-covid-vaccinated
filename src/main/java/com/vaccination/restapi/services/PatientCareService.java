@@ -109,7 +109,7 @@ public class PatientCareService{
         comeBackDate = LocalDate.of(_patientCare.getDoseDate().getYear(),
                                                       _patientCare.getDoseDate().getMonth(),
                                                       _patientCare.getDoseDate().getDayOfMonth()
-                                            ).plusDays(_vaccine.getDays());
+                                            ).plusDays(_vaccine.getRestDays());
         }
         //Checks if is the first time for vaccinated
         if(pc.getDose() != 1) {

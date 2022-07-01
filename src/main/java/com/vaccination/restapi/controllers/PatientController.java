@@ -7,13 +7,18 @@ package com.vaccination.restapi.controllers;
 import com.vaccination.restapi.services.PatientService;
 import com.vaccination.restapi.models.Patient;
 import com.vaccination.restapi.payload.response.MessageResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import java.util.List;
+import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,10 +57,19 @@ public class PatientController {
     
     //Adds a new patient
     @PostMapping("/save")
-    public ResponseEntity<?> addPatient(@Valid @RequestBody Patient patient) {
-        patientService.addPatient(patient);
-        return ResponseEntity.ok(new MessageResponse(
-                "Patient was successfully added"));
+    public ResponseEntity<?> addPatient(@Valid @RequestBody Patient patient, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> errors = new ArrayList<>();
+            for (ObjectError error : result.getAllErrors()) {
+                errors.add(error.getDefaultMessage());
+            }
+            String message = String.format("%s", errors);
+            return ResponseEntity.badRequest().body(new MessageResponse(message));
+        } else {
+            Patient _patient = patientService.addPatient(patient);
+            return ResponseEntity.ok(new MessageResponse(
+                    "Patient was successfully added", _patient));
+        }        
     }
     
     //Updates the patient

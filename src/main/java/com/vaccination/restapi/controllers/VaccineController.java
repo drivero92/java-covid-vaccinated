@@ -4,9 +4,11 @@
  */
 package com.vaccination.restapi.controllers;
 
+import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.payload.response.MessageResponse;
 import com.vaccination.restapi.services.VaccineService;
+import java.util.ArrayList;
 
 import java.util.List;
 import javax.validation.Valid;
@@ -14,6 +16,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,10 +56,19 @@ public class VaccineController {
     
     //Adds a new vaccine
     @PostMapping("/save")
-    public ResponseEntity<?> addVaccine(@Valid @RequestBody Vaccine vaccine) {
-        vaccineService.addVaccine(vaccine);
-        return ResponseEntity.ok(new MessageResponse(
+    public ResponseEntity<?> addVaccine(@Valid @RequestBody Vaccine vaccine, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> errors = new ArrayList<>();
+            for (ObjectError error : result.getAllErrors()) {
+                errors.add(error.getDefaultMessage());
+            }
+            String message = String.format("%s", errors);
+            return ResponseEntity.badRequest().body(new MessageResponse(message));
+        } else {
+            vaccineService.addVaccine(vaccine);
+            return ResponseEntity.ok(new MessageResponse(
                 "Vaccine was successfully added"));
+        }        
     }
     
     //Updates the vaccine

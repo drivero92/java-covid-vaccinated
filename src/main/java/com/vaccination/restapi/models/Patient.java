@@ -10,7 +10,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.lang.NonNull;
 
@@ -25,19 +27,18 @@ public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
-    @NonNull
     private Integer id;
 
-    @NonNull
+    @NotNull(message = "El campo de carnet de identidad del paciente no debe estar vacía")
     private Integer ci;
     
-    @NotBlank
+    @NotBlank(message = "El campo de nombre del paciente no debe quedar en blanco")
     private String name;
     
-    @NotBlank
+    @NotBlank(message = "El campo de apellido del paciente no debe quedar en blanco")
     private String lastName;
 
-    @NonNull
+    @NotNull(message = "El campo de edad del paciente no debe estar vacía")
     private Byte age;
     
     public Patient() {
