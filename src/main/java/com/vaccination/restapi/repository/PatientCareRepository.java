@@ -23,19 +23,19 @@ public interface PatientCareRepository extends JpaRepository<PatientCare, Intege
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "
                     + "WHERE fk_patient=:id "
-                    + "AND dose=(SELECT MAX(dose) FROM patient_vaccine WHERE fk_patient=:id)", nativeQuery = true)
-    Optional<PatientCare> findByIdPatient(@Param("id") Integer id);
+                    + "AND id=(SELECT MAX(id) FROM patient_vaccine WHERE fk_patient=:id)", nativeQuery = true)
+    Optional<PatientCare> findByPatientId(@Param("id") Integer id);
     
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "
                     + "WHERE fk_patient=:id", nativeQuery = true)
-    List<PatientCare> findPCsByIdPatient(@Param("id") Integer id);
+    List<PatientCare> findPCsByPatientId(@Param("id") Integer id);
     
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "
                     + "WHERE fk_vaccine=:id "
                     + "ORDER BY fk_patient ASC", nativeQuery = true)
-    List<PatientCare> findPCsByIdVaccine(@Param("id") Integer id);
+    List<PatientCare> findPCsByVaccineId(@Param("id") Integer id);
     
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "

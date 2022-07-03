@@ -65,9 +65,9 @@ public class VaccineController {
             String message = String.format("%s", errors);
             return ResponseEntity.badRequest().body(new MessageResponse(message));
         } else {
-            vaccineService.addVaccine(vaccine);
+            Vaccine _vaccine = vaccineService.addVaccine(vaccine);
             return ResponseEntity.ok(new MessageResponse(
-                "Vaccine was successfully added"));
+                "Vaccine was successfully added", _vaccine));
         }        
     }
     

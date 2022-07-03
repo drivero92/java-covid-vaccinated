@@ -48,8 +48,8 @@ public class PatientCareService{
     }
     
     //Returns a list of patient cares (PCs) by the patient id and the doses
-    public List<PatientCare> getPCsByIdPatient(Integer id) {
-        List<PatientCare> _patientCare = patientCareRepository.findPCsByIdPatient(id);
+    public List<PatientCare> getPCsByPatientId(Integer id) {
+        List<PatientCare> _patientCare = patientCareRepository.findPCsByPatientId(id);
         if (_patientCare.isEmpty()) {
             throw new ApiNoContentException(
                     "The list of patient cares of the patient id: "+ id +" has no content");
@@ -59,14 +59,14 @@ public class PatientCareService{
     }
     
     //Returns a patient care by the patient id
-    public PatientCare getPatientCareByIdPatient(Integer id) {
-        return patientCareRepository.findByIdPatient(id)
+    public PatientCare getPatientCareByPatientId(Integer id) {
+        return patientCareRepository.findByPatientId(id)
                 .orElse(null);
     }
     
     //Returns a patient care by the vaccine id
-    public List<PatientCare> getPCsByIdVaccine(Integer id) {
-        List<PatientCare> _patientCare = patientCareRepository.findPCsByIdVaccine(id);
+    public List<PatientCare> getPCsByVaccineId(Integer id) {
+        List<PatientCare> _patientCare = patientCareRepository.findPCsByVaccineId(id);
         if (_patientCare.isEmpty()) {
             throw new ApiNoContentException(
                     "It doesnot exist the patient cares list with vaccine id: "+ id);
@@ -103,47 +103,56 @@ public class PatientCareService{
     public PatientCare addManagedPatientCare(PatientCare pc) {        
         PatientCare _pc = null;
         LocalDate comeBackDate = null;
-        Vaccine _vaccine = vacccineService.getVaccine(pc.getIdVaccine());
-        PatientCare _patientCare = this.getPatientCareByIdPatient(pc.getIdPatient());
+        Vaccine _vaccine = vacccineService.getVaccine(pc.getVaccineId());
+        PatientCare _patientCare = this.getPatientCareByPatientId(pc.getPatientId());
         if(_patientCare!=null) {
         comeBackDate = LocalDate.of(_patientCare.getDoseDate().getYear(),
                                                       _patientCare.getDoseDate().getMonth(),
                                                       _patientCare.getDoseDate().getDayOfMonth()
                                             ).plusDays(_vaccine.getRestDays());
         }
-        //Checks if is the first time for vaccinated
-        if(pc.getDose() != 1) {
-            //Checks if the patient vaccinated has the complete dose
-            if (!_patientCare.isCompleteDose()) {
-                //Check if the patient has taken enough rest
-                if(pc.getDoseDate().isAfter(comeBackDate)) {
-                    //Checks if is the same vaccine brand
-                    if(_patientCare.getVaccine().getName() == null ? _vaccine.getName() == null : 
-                            _patientCare.getVaccine().getName().equals(_vaccine.getName())) {
-                        if(pc.getDose().equals(_vaccine.getCompleteDose())) {
-                            pc.setCompleteDose(true);
+        //Checks if he is the first time for vaccinated
+        if(pc.getDose() > 1) {
+            //Checks if he is an old patient who was vaccinated
+            if (_patientCare != null) {
+                if (_patientCare.getDose().equals(pc.getDose())) {
+                    throw new ApiRequestException("El paciente ya obtuvo la dosis " +_patientCare.getDose());
+                } else {                
+                    //Checks if the patient vaccinated has the complete dose
+                    if (!_patientCare.isCompleteDose()) {
+                        //Check if the patient has taken enough rest
+                        if(pc.getDoseDate().isAfter(comeBackDate)) {
+                            //Checks if is the same vaccine brand
+                            if(_patientCare.getVaccine().getName() == null ? _vaccine.getName() == null : 
+                                    _patientCare.getVaccine().getName().equals(_vaccine.getName())) {
+                                if(pc.getDose().equals(_vaccine.getCompleteDose())) {
+                                    pc.setCompleteDose(true);
+                                }
+                                vacccineService.reduceQuantity(_vaccine);
+                                _pc = addPatientCare(pc);
+                            } else {
+                                throw new ApiRequestException(
+                                        "No es compatible con la primera vacuna: "+_patientCare.getVaccine().getName());
+                            }
+                        } else {
+                            throw new ApiRequestException(
+                                    "El paciente "+_patientCare.getPatient().getName()+" le faltan días de descanso para la siguiente dosis");
                         }
-                        vacccineService.reduceQuantity(_vaccine);
-                        _pc = addPatientCare(pc);
                     } else {
-                        throw new ApiRequestException(
-                                "No es compatible con la primera vacuna: "+_patientCare.getVaccine().getName());
+                        throw new ApiRequestException("La dosis de la vacuna "+_patientCare.getVaccine().getName()+" esta completa");
                     }
-                } else {
-                    throw new ApiRequestException(
-                            "El paciente "+_patientCare.getPatient().getName()+" le faltan días de descanso para la siguiente dosis");
                 }
             } else {
-                throw new ApiRequestException("La dosis de la vacuna "+_patientCare.getVaccine().getName()+" esta completa");
-            }            
+                throw new ApiRequestException("El paciente no recibió la primera dosis");
+            }
         } else {
-            if(_patientCare != null) {
-                if(pc.getDose()==1 && _patientCare.getIdVaccine()==pc.getIdVaccine()) {
+            if (_patientCare != null) {
+                if (pc.getDose() == 1 && _patientCare.getVaccineId().equals(pc.getVaccineId())) {
                     throw new ApiRequestException("El paciente ya se vacuno con la primera dosis");
                 } else {
                     if (_patientCare.isCompleteDose()) {
-                        if(compatibleVaccines(pc.getIdVaccine(),_patientCare.getVaccine())) {
-                            if(pc.getDoseDate().isAfter(comeBackDate)) {
+                        if(compatibleVaccines(pc.getVaccineId(),_patientCare.getVaccine())) {
+                            if (pc.getDoseDate().isAfter(comeBackDate)) {
                                 pc.setCompleteDose(true);
                                 vacccineService.reduceQuantity(_vaccine);
                                 _pc = addPatientCare(pc);
@@ -184,7 +193,7 @@ public class PatientCareService{
             resp = true;
         }
         //First vaccine AstraZeneca: 5 and booster dose is Moderna: 1
-        if (vaccine1 == 1 && vaccine2.getId() == 5) {
+        if (vaccine1 == 4 && vaccine2.getId() == 5) {
             resp = true;
         }
         //First vaccine Sinopharm: 7 and booster dose is Pfizer: 2

@@ -35,7 +35,7 @@ public class PatientCare {
     
     @Column(name = "fk_patient")
     @NonNull
-    private Integer idPatient;
+    private Integer patientId;
     
     @JoinColumn(name = "fk_patient", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)//Merge funciona para actualizar los otros objetos vacuna y paciente pero baja la seguridad al actualizar en pc
@@ -44,7 +44,7 @@ public class PatientCare {
     
     @Column(name = "fk_vaccine")
     @NonNull
-    private Integer idVaccine;    
+    private Integer vaccineId;
     
     @JoinColumn(name = "fk_vaccine", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)
@@ -70,9 +70,9 @@ public class PatientCare {
                         LocalDate doseDate,
                         boolean completeDose) {
         this.patient = patient;
-        this.idPatient = idPatient;
+        this.patientId = idPatient;
         this.vaccine = vaccine;
-        this.idVaccine = idVaccine;
+        this.vaccineId = idVaccine;
         this.dose = dose;
         this.doseDate = doseDate;
         this.completeDose = completeDose;
@@ -86,20 +86,20 @@ public class PatientCare {
         this.id = id;
     }
 
-    public Integer getIdPatient() {
-        return idPatient;
+    public Integer getPatientId() {
+        return patientId;
     }
 
-    public void setIdPatient(Integer idPatient) {
-        this.idPatient = idPatient;
+    public void setPatientId(Integer patientId) {
+        this.patientId = patientId;
     }
 
-    public Integer getIdVaccine() {
-        return idVaccine;
+    public Integer getVaccineId() {
+        return vaccineId;
     }
 
-    public void setIdVaccine(Integer idVaccine) {
-        this.idVaccine = idVaccine;
+    public void setVaccineId(Integer vaccineId) {
+        this.vaccineId = vaccineId;
     }
 
     public Patient getPatient() {

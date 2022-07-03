@@ -56,22 +56,22 @@ public class PatientCareController {
     
     //Returns a list of specific patient vaccinated
     @GetMapping("/list_patient_care/{patientId}")
-    public ResponseEntity<List<PatientCare>> getPCsByIdPatient(@PathVariable("patientId") Integer id) {
-        List<PatientCare> _patientCareList = patientCareService.getPCsByIdPatient(id);
+    public ResponseEntity<List<PatientCare>> getPCsByPatientId(@PathVariable("patientId") Integer id) {
+        List<PatientCare> _patientCareList = patientCareService.getPCsByPatientId(id);
         return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
     }
     
     //Returns a list of specific patient vaccinated
     @GetMapping("/get/last_patient_care_byPatientId/{patientId}")
-    public ResponseEntity<PatientCare> getLastPCByIdPatient(@PathVariable("patientId") Integer id) {
-        PatientCare _patientCare = patientCareService.getPatientCareByIdPatient(id);
+    public ResponseEntity<PatientCare> getLastPCByPatientId(@PathVariable("patientId") Integer id) {
+        PatientCare _patientCare = patientCareService.getPatientCareByPatientId(id);
         return new ResponseEntity<>(_patientCare, HttpStatus.OK);
     }
     
     //Returns a list of patients vaccinated with the same vaccine
     @GetMapping("/list_vaccines_patient_care/{vaccineId}")
-    public ResponseEntity<List<PatientCare>> getPCsByIdVaccine(@PathVariable("vaccineId") Integer id) {
-        List<PatientCare> _patientCareList = patientCareService.getPCsByIdVaccine(id);
+    public ResponseEntity<List<PatientCare>> getPCsByVaccineId(@PathVariable("vaccineId") Integer id) {
+        List<PatientCare> _patientCareList = patientCareService.getPCsByVaccineId(id);
         return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
     }
     
