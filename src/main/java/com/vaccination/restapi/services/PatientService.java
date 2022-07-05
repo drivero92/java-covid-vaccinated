@@ -39,7 +39,7 @@ public class PatientService {
     public Patient getPatient(Integer id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException(
-                        "The id patient: "+id+" is not found"));
+                        "Patient id : "+id+" is not found"));
     }
     
     //Adds a new patient and return with its own id

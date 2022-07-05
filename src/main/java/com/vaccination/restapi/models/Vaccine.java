@@ -12,6 +12,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import org.springframework.lang.NonNull;
 
 /**
@@ -26,16 +28,20 @@ public class Vaccine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
+    @Pattern(regexp = "^[a-zA-Z ]+$",message = "El nombre de la vacuna solo debe contener texto")
     @NotBlank(message = "El nombre de la vacuna no debe estar en blanco")
     @NotEmpty(message = "El nombre de la vacuna no debe estar vacía")
     private String name;
 
+    @Positive(message = "La cantidad de la vacuna debe ser mayor a cero")
     @NotNull(message = "La cantidad de la vacuna no debe estar vacía")
     private Integer quantity;
     
+    @Positive(message = "Los dias de descanso de la vacuna debe ser mayor a cero")
     @NotNull(message = "Los dias de descanso de la vacuna no debe estar vacía")
     private Short restDays;
     
+    @Positive(message = "El numero de dosis para completar la vacuna debe ser mayor a cero")
     @NotNull(message = "El numero de dosis para completar la vacuna no debe estar vacía")
     private Byte completeDose;
     

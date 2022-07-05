@@ -59,11 +59,11 @@ public class PatientController {
     @PostMapping("/save")
     public ResponseEntity<?> addPatient(@Valid @RequestBody Patient patient, BindingResult result) {
         if (result.hasErrors()) {
-            List<String> errors = new ArrayList<>();
+            List<String> _errors = new ArrayList<>();
             for (ObjectError error : result.getAllErrors()) {
-                errors.add(error.getDefaultMessage());
+                _errors.add(error.getDefaultMessage());
             }
-            String message = String.format("%s", errors);
+            String message = String.format("%s", _errors);
             return ResponseEntity.badRequest().body(new MessageResponse(message));
         } else {
             Patient _patient = patientService.addPatient(patient);
@@ -74,9 +74,18 @@ public class PatientController {
     
     //Updates the patient
     @PutMapping("/update")
-    public ResponseEntity<Patient> updatePatient(@Valid @RequestBody Patient patient) {
-        Patient _patient = patientService.updatePatient(patient);
-        return new ResponseEntity<>(_patient, HttpStatus.OK);
+    public ResponseEntity<?> updatePatient(@Valid @RequestBody Patient patient, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> _errors = new ArrayList<>();
+            for (ObjectError allError : result.getAllErrors()) {
+                _errors.add(allError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", _errors)));
+        } else {
+            Patient _patient = patientService.updatePatient(patient);
+            return ResponseEntity.ok(new MessageResponse(
+                    "Patient was successfully updated", _patient));
+        }        
     }
     
     //Deletes a patient

@@ -4,6 +4,7 @@
  */
 package com.vaccination.restapi.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDate;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,10 +15,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-
-import org.springframework.lang.NonNull;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  *
@@ -25,36 +27,37 @@ import org.springframework.lang.NonNull;
  */
 @Entity
 @Table(name = "patient_vaccine")
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PatientCare {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
-    @NonNull
     private Integer id;
     
     @Column(name = "fk_patient")
-    @NonNull
+    //@NotNull(message = "El campo del id del paciente no debe ser nulo")//Patient id field must not be null
     private Integer patientId;
     
     @JoinColumn(name = "fk_patient", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)//Merge funciona para actualizar los otros objetos vacuna y paciente pero baja la seguridad al actualizar en pc
-    @NonNull
+    //@NotNull(message = "El campo del id del paciente no debe ser nulo")
     private Patient patient;
     
     @Column(name = "fk_vaccine")
-    @NonNull
+    //@NotNull(message = "El campo del id de la vacuna no debe ser nulo")
     private Integer vaccineId;
     
     @JoinColumn(name = "fk_vaccine", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)
-    @NonNull
+    //@NotNull(message = "El campo del id de la vacuna no debe ser nulo")
     private Vaccine vaccine;
     
-    @NonNull
+    @Positive(message = "La dosis debe ser mayor a cero")
+    @NotNull(message = "La dosis no deber ser nulo")
     private Byte dose;
     
-    @NonNull
+    @NotNull(message = "La fecha de la dosis no deber ser nulo")
     private LocalDate doseDate;
     
     private boolean completeDose;

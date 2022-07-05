@@ -10,6 +10,7 @@ import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.repository.PatientCareRepository;
 import com.vaccination.restapi.models.PatientCare;
+import com.vaccination.restapi.payload.response.MessageResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -115,9 +116,7 @@ public class PatientCareService{
         if(pc.getDose() > 1) {
             //Checks if he is an old patient who was vaccinated
             if (_patientCare != null) {
-                if (_patientCare.getDose().equals(pc.getDose())) {
-                    throw new ApiRequestException("El paciente ya obtuvo la dosis " +_patientCare.getDose());
-                } else {                
+                if (!_patientCare.getDose().equals(pc.getDose())) {
                     //Checks if the patient vaccinated has the complete dose
                     if (!_patientCare.isCompleteDose()) {
                         //Check if the patient has taken enough rest
@@ -129,6 +128,7 @@ public class PatientCareService{
                                     pc.setCompleteDose(true);
                                 }
                                 vacccineService.reduceQuantity(_vaccine);
+                                //throw new MessageResponse("hola");
                                 _pc = addPatientCare(pc);
                             } else {
                                 throw new ApiRequestException(
@@ -136,11 +136,13 @@ public class PatientCareService{
                             }
                         } else {
                             throw new ApiRequestException(
-                                    "El paciente "+_patientCare.getPatient().getName()+" le faltan días de descanso para la siguiente dosis");
+                                    "El paciente no se ha añadido, necesita pasar los días de descanso, deberá volver posterior a "+comeBackDate);
                         }
                     } else {
                         throw new ApiRequestException("La dosis de la vacuna "+_patientCare.getVaccine().getName()+" esta completa");
                     }
+                } else {
+                    throw new ApiRequestException("El paciente ya obtuvo la dosis " +_patientCare.getDose());                    
                 }
             } else {
                 throw new ApiRequestException("El paciente no recibió la primera dosis");
@@ -158,8 +160,8 @@ public class PatientCareService{
                                 _pc = addPatientCare(pc);
                             } else {
                                 throw new ApiRequestException(
-                                        "El paciente "+_patientCare.getPatient().getName()+
-                                                " le faltan días de descanso para la siguiente dosis de refuerzo");
+                                        "El paciente no se ha añadido, necesita pasar los días de descanso"
+                                                + " para la dosis de refuerzo, deberá volver posterior a " +comeBackDate);
                             }
                         } else {
                             throw new ApiRequestException("No son compatibles las vacunas");

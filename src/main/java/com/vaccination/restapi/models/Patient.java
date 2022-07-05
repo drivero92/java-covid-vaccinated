@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 
 import org.springframework.lang.NonNull;
 
@@ -29,16 +31,20 @@ public class Patient {
     @Column(unique = true)
     private Integer id;
 
-    @NotNull(message = "El campo de carnet de identidad del paciente no debe estar vacía")
+    @Positive(message = "El carnet de identidad del paciente debe ser mayor a cero")
+    @NotNull(message = "El carnet de identidad del paciente no debe estar vacía")
     private Integer ci;
     
-    @NotBlank(message = "El campo de nombre del paciente no debe quedar en blanco")
+    @Pattern(regexp = "^[a-zA-Z ]+$",message = "El nombre del paciente solo debe contener texto")
+    @NotBlank(message = "El nombre del paciente no debe quedar en blanco")
     private String name;
     
-    @NotBlank(message = "El campo de apellido del paciente no debe quedar en blanco")
+    @Pattern(regexp = "^[a-zA-Z ]+$",message = "El apellido del paciente solo debe contener texto")
+    @NotBlank(message = "El apellido del paciente no debe quedar en blanco")
     private String lastName;
 
-    @NotNull(message = "El campo de edad del paciente no debe estar vacía")
+    @Positive(message = "La edad del paciente debe ser mayor a cero")
+    @NotNull(message = "La edad del paciente no debe estar vacía")
     private Byte age;
     
     public Patient() {

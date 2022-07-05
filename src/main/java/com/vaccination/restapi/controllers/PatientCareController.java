@@ -9,12 +9,15 @@ import com.vaccination.restapi.models.PatientCare;
 import com.vaccination.restapi.payload.response.MessageResponse;
 import com.vaccination.restapi.services.VaccineService;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,18 +87,35 @@ public class PatientCareController {
     
     //Add a new vaccinated patient
     @PostMapping("/save")
-    public ResponseEntity<?> addPatientCare(@Valid @RequestBody PatientCare pc) {
+    public ResponseEntity<?> addPatientCare(@Valid @RequestBody PatientCare pc, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> _errors = new ArrayList<>();
+            for (ObjectError allError : result.getAllErrors()) {
+                _errors.add(allError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", _errors)));
+        } else {
         PatientCare _patientCare = patientCareService.addManagedPatientCare(pc);
         //Another way to response
         return ResponseEntity.ok(new MessageResponse(
                 "Patient care was successfully added", _patientCare));
+        }
     }
     
     //Update the patient care
     @PutMapping("/update")
-    public ResponseEntity<PatientCare> updatePatientCare(@RequestBody @Valid PatientCare pc) {
-        PatientCare _patientCare = patientCareService.updatePatientCare(pc);
-        return new ResponseEntity<>(_patientCare, HttpStatus.OK);
+    public ResponseEntity<?> updatePatientCare(@RequestBody @Valid PatientCare pc, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> errors = new ArrayList<>();
+            for (ObjectError allError : result.getAllErrors()) {
+                errors.add(allError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", errors)));
+        } else {
+            PatientCare _patientCare = patientCareService.updatePatientCare(pc);
+            return ResponseEntity.ok(new MessageResponse(
+                    "Patient care was successfully updated", _patientCare));
+        }        
     }
     
     //Deletes a patient care

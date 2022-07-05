@@ -58,11 +58,11 @@ public class VaccineController {
     @PostMapping("/save")
     public ResponseEntity<?> addVaccine(@Valid @RequestBody Vaccine vaccine, BindingResult result) {
         if (result.hasErrors()) {
-            List<String> errors = new ArrayList<>();
+            List<String> _errors = new ArrayList<>();
             for (ObjectError error : result.getAllErrors()) {
-                errors.add(error.getDefaultMessage());
+                _errors.add(error.getDefaultMessage());
             }
-            String message = String.format("%s", errors);
+            String message = String.format("%s", _errors);
             return ResponseEntity.badRequest().body(new MessageResponse(message));
         } else {
             Vaccine _vaccine = vaccineService.addVaccine(vaccine);
@@ -73,9 +73,18 @@ public class VaccineController {
     
     //Updates the vaccine
     @PutMapping("/update")
-    public ResponseEntity<Vaccine> updateVaccine(@Valid @RequestBody Vaccine vaccine) {
-        Vaccine _vaccine = vaccineService.updateVaccine(vaccine);
-        return new ResponseEntity<>(_vaccine, HttpStatus.OK);
+    public ResponseEntity<?> updateVaccine(@Valid @RequestBody Vaccine vaccine, BindingResult result) {
+        if (result.hasErrors()) {
+            List<String> _errors = new ArrayList<>();
+            for (ObjectError allError : result.getAllErrors()) {
+                _errors.add(allError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", _errors)));
+        } else {
+            Vaccine _vaccine = vaccineService.updateVaccine(vaccine);
+            return ResponseEntity.ok(new MessageResponse(
+                    "Vaccine was successfully updated", _vaccine));
+        }
     }
     
     //Deletes a vaccine

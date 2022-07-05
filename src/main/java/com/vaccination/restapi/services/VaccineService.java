@@ -40,7 +40,7 @@ public class VaccineService {
     public Vaccine getVaccine(Integer id) {
         return vaccineRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException(
-                        "The id vaccine: "+id+" is not found"));
+                        "Vaccine id : "+id+" is not found"));
     }
     
     //Adds the vaccine to the repository and returns the vaccine with its own id
