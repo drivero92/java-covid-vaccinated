@@ -36,28 +36,25 @@ public class PatientCare {
     private Integer id;
     
     @Column(name = "fk_patient")
-    //@NotNull(message = "El campo del id del paciente no debe ser nulo")//Patient id field must not be null
+    @NotNull(message = "La dosis no deber ser patientId")
     private Integer patientId;
     
     @JoinColumn(name = "fk_patient", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)//Merge funciona para actualizar los otros objetos vacuna y paciente pero baja la seguridad al actualizar en pc
-    //@NotNull(message = "El campo del id del paciente no debe ser nulo")
     private Patient patient;
     
     @Column(name = "fk_vaccine")
-    //@NotNull(message = "El campo del id de la vacuna no debe ser nulo")
     private Integer vaccineId;
     
     @JoinColumn(name = "fk_vaccine", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)
-    //@NotNull(message = "El campo del id de la vacuna no debe ser nulo")
     private Vaccine vaccine;
     
-    @Positive(message = "La dosis debe ser mayor a cero")
-    @NotNull(message = "La dosis no deber ser nulo")
+    @Positive(message = "Dose must be greater than zero")
+    @NotNull(message = "Dose must be greater than zero")
     private Byte dose;
     
-    @NotNull(message = "La fecha de la dosis no deber ser nulo")
+    @NotNull(message = "Dose date must not be null")
     private LocalDate doseDate;
     
     private boolean completeDose;
@@ -66,16 +63,16 @@ public class PatientCare {
     }
 
     public PatientCare( Patient patient, 
-                        Integer idPatient, 
+                        Integer patientId, 
                         Vaccine vaccine, 
-                        Integer idVaccine, 
+                        Integer vaccineId, 
                         Byte dose, 
                         LocalDate doseDate,
                         boolean completeDose) {
         this.patient = patient;
-        this.patientId = idPatient;
+        this.patientId = patientId;
         this.vaccine = vaccine;
-        this.vaccineId = idVaccine;
+        this.vaccineId = vaccineId;
         this.dose = dose;
         this.doseDate = doseDate;
         this.completeDose = completeDose;

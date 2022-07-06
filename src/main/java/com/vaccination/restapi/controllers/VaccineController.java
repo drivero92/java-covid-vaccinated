@@ -6,9 +6,11 @@ package com.vaccination.restapi.controllers;
 
 import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.models.Vaccine;
+import com.vaccination.restapi.models.FullVaccine;
 import com.vaccination.restapi.payload.response.MessageResponse;
 import com.vaccination.restapi.services.VaccineService;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import java.util.List;
 import javax.validation.Valid;
@@ -52,6 +54,13 @@ public class VaccineController {
     public ResponseEntity<Vaccine> getVaccine(@PathVariable Integer id) {
         Vaccine _vaccine = vaccineService.getVaccine(id);
         return new ResponseEntity<>(_vaccine, HttpStatus.OK);
+    }
+    
+    //Returns the vaccine from service
+    @GetMapping("/get_full_vaccines/{id}")
+    public ResponseEntity<Collection<FullVaccine>> getFullVaccines(@PathVariable Integer id) {
+        Vaccine _vaccine = vaccineService.getVaccine(id);
+        return new ResponseEntity<>(_vaccine.getFullVaccines(), HttpStatus.OK);
     }
     
     //Adds a new vaccine

@@ -45,7 +45,7 @@ public class PatientCareService{
     public PatientCare getPatientCare(Integer id) {
         return patientCareRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException(
-                        "The patient care "+id+" is not found"));
+                        "The patient care id: "+id+" is not found"));
     }
     
     //Returns a list of patient cares (PCs) by the patient id and the doses
@@ -124,7 +124,7 @@ public class PatientCareService{
                             //Checks if is the same vaccine brand
                             if(_patientCare.getVaccine().getName() == null ? _vaccine.getName() == null : 
                                     _patientCare.getVaccine().getName().equals(_vaccine.getName())) {
-                                if(pc.getDose().equals(_vaccine.getCompleteDose())) {
+                                if(pc.getDose().equals(_vaccine.getNumberDoses())) {
                                     pc.setCompleteDose(true);
                                 }
                                 vacccineService.reduceQuantity(_vaccine);
@@ -132,25 +132,26 @@ public class PatientCareService{
                                 _pc = addPatientCare(pc);
                             } else {
                                 throw new ApiRequestException(
-                                        "No es compatible con la primera vacuna: "+_patientCare.getVaccine().getName());
+                                        "It is not compatible with the first vaccine: "+_patientCare.getVaccine().getName());
                             }
                         } else {
                             throw new ApiRequestException(
-                                    "El paciente no se ha añadido, necesita pasar los días de descanso, deberá volver posterior a "+comeBackDate);
+                                    "Patient has not been added, needs to spend days off, should return later in "+comeBackDate);
                         }
                     } else {
-                        throw new ApiRequestException("La dosis de la vacuna "+_patientCare.getVaccine().getName()+" esta completa");
+                        throw new ApiRequestException(
+                                "The doses of the "+_patientCare.getVaccine().getName()+" vaccine were complete");
                     }
                 } else {
-                    throw new ApiRequestException("El paciente ya obtuvo la dosis " +_patientCare.getDose());                    
+                    throw new ApiRequestException("Patient has already received dose " +_patientCare.getDose());                    
                 }
             } else {
-                throw new ApiRequestException("El paciente no recibió la primera dosis");
+                throw new ApiRequestException("The patient did not receive the first dose");
             }
         } else {
             if (_patientCare != null) {
                 if (pc.getDose() == 1 && _patientCare.getVaccineId().equals(pc.getVaccineId())) {
-                    throw new ApiRequestException("El paciente ya se vacuno con la primera dosis");
+                    throw new ApiRequestException("The patient has already been vaccinated with the first dose.");
                 } else {
                     if (_patientCare.isCompleteDose()) {
                         if(compatibleVaccines(pc.getVaccineId(),_patientCare.getVaccine())) {
@@ -160,14 +161,14 @@ public class PatientCareService{
                                 _pc = addPatientCare(pc);
                             } else {
                                 throw new ApiRequestException(
-                                        "El paciente no se ha añadido, necesita pasar los días de descanso"
-                                                + " para la dosis de refuerzo, deberá volver posterior a " +comeBackDate);
+                                        "Patient has not been added, needs to spend the days off"
+                                                + " for the booster dose, should return later in " +comeBackDate);
                             }
                         } else {
-                            throw new ApiRequestException("No son compatibles las vacunas");
+                            throw new ApiRequestException("Vaccines are not compatible");
                         }                        
                     } else {
-                        throw new ApiRequestException("No tiene la dosis completa");
+                        throw new ApiRequestException("Does not have the full dose");
                     }
                 }
             } else {
