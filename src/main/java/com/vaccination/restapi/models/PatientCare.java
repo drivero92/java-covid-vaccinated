@@ -4,7 +4,6 @@
  */
 package com.vaccination.restapi.models;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDate;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,9 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -27,7 +23,6 @@ import javax.validation.constraints.Positive;
  */
 @Entity
 @Table(name = "patient_vaccine")
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PatientCare {
     
     @Id
@@ -36,7 +31,7 @@ public class PatientCare {
     private Integer id;
     
     @Column(name = "fk_patient")
-    @NotNull(message = "La dosis no deber ser patientId")
+    @NotNull(message = "Patient must not be empty")
     private Integer patientId;
     
     @JoinColumn(name = "fk_patient", insertable = false, updatable = false)
@@ -44,6 +39,7 @@ public class PatientCare {
     private Patient patient;
     
     @Column(name = "fk_vaccine")
+    @NotNull(message = "Vaccine must not be empty")
     private Integer vaccineId;
     
     @JoinColumn(name = "fk_vaccine", insertable = false, updatable = false)

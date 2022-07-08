@@ -4,7 +4,6 @@
  */
 package com.vaccination.restapi.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -17,15 +16,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
-import org.springframework.lang.NonNull;
 
 /**
  *
@@ -40,7 +35,6 @@ public class Vaccine {
     @Column(name = "vaccine_id")
     private Integer id;
     
-    @Pattern(regexp = "^[a-zA-Z ]+$",message = "The name of the vaccine should only contain text")
     @NotBlank(message = "Vaccine name should not be blank")
     @NotEmpty(message = "The name of the vaccine must not be empty")
     private String name;
@@ -57,19 +51,22 @@ public class Vaccine {
     @NotNull(message = "The number of doses to complete the vaccine must not be empty.")
     private Byte numberDoses;
     
-    @ManyToMany(targetEntity = FullVaccine.class, cascade = CascadeType.ALL, fetch=FetchType.LAZY)
-    @JoinTable( name = "compatible_vaccines",
-                joinColumns = @JoinColumn(name = "vaccine_id", referencedColumnName = "vaccine_id"),
-                inverseJoinColumns = @JoinColumn(name = "full_vaccine_id", referencedColumnName = "full_vaccine_id"))
+    @ManyToMany(targetEntity = FullVaccine.class, 
+                cascade = {CascadeType.MERGE, CascadeType.PERSIST}, 
+                fetch=FetchType.LAZY, 
+                mappedBy = "vaccines")
+//    @JoinTable( name = "compatible_vaccines",
+//                joinColumns = @JoinColumn(name = "vaccine_id", referencedColumnName = "vaccine_id"),
+//                inverseJoinColumns = @JoinColumn(name = "full_vaccine_id", referencedColumnName = "full_vaccine_id"))
     private Set<FullVaccine> fullVaccines = new HashSet<>();
 
     public Vaccine() {
     }
 
-    public Vaccine(String name, Integer quantity, Short days, Byte numberDoses) {
+    public Vaccine(String name, Integer quantity, Short restDays, Byte numberDoses) {
         this.name = name;
         this.quantity = quantity;
-        this.restDays = days;
+        this.restDays = restDays;
         this.numberDoses = numberDoses;
     }
 
@@ -125,4 +122,11 @@ public class Vaccine {
         this.fullVaccines = fullVaccines;
     }
     
+    public void removeFullVaccines(Integer fullVaccineId) {
+        FullVaccine _fullVaccine = this.fullVaccines.stream().filter(fv -> fv.getId() == fullVaccineId).findFirst().orElse(null);
+        if (_fullVaccine != null) {
+            this.fullVaccines.remove(_fullVaccine);
+            _fullVaccine.getVaccines().remove(this);
+        }
+    }
 }

@@ -5,6 +5,7 @@
 package com.vaccination.restapi.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -17,7 +18,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -27,6 +27,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "full_vaccine")
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FullVaccine {
     
     @Id
@@ -34,20 +35,21 @@ public class FullVaccine {
     @Column(name = "full_vaccine_id", unique = true)
     private Integer id;
     
-    @Column(name = "fk_vaccine")
-    private Integer vaccineId;
+    @Column(name = "fk_vaccine", insertable = false, updatable = false)
+    private Integer vaccineId;//CHECK, maybe never used
     
-    @JoinColumn(name = "fk_vaccine", insertable = false, updatable = false)
+    @JoinColumn(name = "fk_vaccine")
     @OneToOne(cascade = CascadeType.MERGE)
     private Vaccine vaccine;
     
-    @ManyToMany(targetEntity=Vaccine.class, cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany(targetEntity=Vaccine.class, 
+                cascade = {CascadeType.MERGE, CascadeType.PERSIST}, 
+                fetch=FetchType.LAZY)
     @JsonBackReference
     @JoinTable( name = "compatible_vaccines", 
                 joinColumns = @JoinColumn(name = "full_vaccine_id", referencedColumnName = "full_vaccine_id"), 
                 inverseJoinColumns = @JoinColumn(name = "vaccine_id", referencedColumnName = "vaccine_id"))
-    private Set<Vaccine> vaccines = new HashSet<>();
-    
+    private Set<Vaccine> vaccines = new HashSet<>();    
 
     public FullVaccine() {
     }
@@ -89,21 +91,11 @@ public class FullVaccine {
         this.vaccines = vaccines;
     }
     
-//    public boolean compatible(Vaccine vaccine) {
-//        
-//        boolean resp = false;
-//        if(this.vaccine.getId() == 6 && vaccine.getId() == 5) {
-//            resp = true;
-//        }
-////        if(this.vaccine.getId() == 1 && vaccine.getId() == 5) {
-////            resp = true;
-////        }
-////        if(this.vaccine.getId() == 1 && vaccine.getId() == 5) {
-////            resp = true;
-////        }
-////        if(this.vaccine.getId() == 1 && vaccine.getId() == 5) {
-////            resp = true;
-////        }
-//        return resp;
-//    }
+    public void removeVaccine(Integer vaccineId) {
+        Vaccine _vaccine = this.vaccines.stream().filter(t -> t.getId() == vaccineId).findFirst().orElse(null);
+        if (_vaccine != null) {
+            this.vaccines.remove(_vaccine);
+            _vaccine.getFullVaccines().remove(this);
+        }
+    }
 }
