@@ -49,7 +49,7 @@ public class FullVaccine {
     @JoinTable( name = "compatible_vaccines", 
                 joinColumns = @JoinColumn(name = "full_vaccine_id", referencedColumnName = "full_vaccine_id"), 
                 inverseJoinColumns = @JoinColumn(name = "vaccine_id", referencedColumnName = "vaccine_id"))
-    private Set<Vaccine> vaccines = new HashSet<>();    
+    private Set<Vaccine> vaccines = new HashSet<>();
 
     public FullVaccine() {
     }

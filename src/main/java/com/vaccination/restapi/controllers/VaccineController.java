@@ -4,6 +4,7 @@
  */
 package com.vaccination.restapi.controllers;
 
+import com.vaccination.restapi.combinolas.CombinolaVaccine;
 import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.models.FullVaccine;
@@ -49,22 +50,27 @@ public class VaccineController {
         return new ResponseEntity<>(_vaccineList, HttpStatus.OK);
     }
     
-    //Returns the vaccine from service
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Vaccine> getVaccine(@PathVariable Integer id) {
+//    //Returns the vaccine from service
+    @GetMapping("/{id}")
+    public ResponseEntity<Vaccine> getVaccineById(@PathVariable Integer id) {
         Vaccine _vaccine = vaccineService.getVaccine(id);
         return new ResponseEntity<>(_vaccine, HttpStatus.OK);
     }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<CombinolaVaccine> getVaccineById(@PathVariable Integer id) {
+//        CombinolaVaccine _vaccine = vaccineService.getVaccine(id);
+//        return new ResponseEntity<>(_vaccine, HttpStatus.OK);
+//    }
     
     //Returns the vaccine from service
-    @GetMapping("/get_full_vaccines/{id}")
-    public ResponseEntity<Collection<FullVaccine>> getFullVaccines(@PathVariable Integer id) {
+    @GetMapping("/full_vaccines/{id}")
+    public ResponseEntity<Collection<FullVaccine>> getFullVaccinesById(@PathVariable Integer id) {
         Vaccine _vaccine = vaccineService.getVaccine(id);
         return new ResponseEntity<>(_vaccine.getFullVaccines(), HttpStatus.OK);
     }
     
     //Adds a new vaccine
-    @PostMapping("/save")
+    @PostMapping()
     public ResponseEntity<?> addVaccine(@Valid @RequestBody Vaccine vaccine, BindingResult result) {
         if (result.hasErrors()) {
             List<String> _errors = new ArrayList<>();
@@ -81,7 +87,7 @@ public class VaccineController {
     }
     
     //Updates the vaccine
-    @PutMapping("/update")
+    @PutMapping()
     public ResponseEntity<?> updateVaccine(@Valid @RequestBody Vaccine vaccine, BindingResult result) {
         if (result.hasErrors()) {
             List<String> _errors = new ArrayList<>();
@@ -98,8 +104,8 @@ public class VaccineController {
     
     //Deletes a vaccine
     //@param Integer id
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteVaccine(@PathVariable Integer id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteVaccineById(@PathVariable Integer id) {
         vaccineService.deleteVaccine(id);
         return ResponseEntity.ok(new MessageResponse(
                 "Vaccine was successfully deleted"));

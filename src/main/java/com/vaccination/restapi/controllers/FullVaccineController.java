@@ -4,6 +4,7 @@
  */
 package com.vaccination.restapi.controllers;
 
+import com.vaccination.restapi.combinolas.CombinolaVaccine;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.models.FullVaccine;
 import com.vaccination.restapi.payload.response.MessageResponse;
@@ -30,41 +31,72 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("full_vaccine")
+@RequestMapping("full_vaccines")
 public class FullVaccineController {
     @Autowired
     FullVaccineService fullVaccineService;
     
+//    @GetMapping("/list")
+//    public ResponseEntity<List<FullVaccine>> getFullVaccines() {
+//        List<FullVaccine> _fullVaccine = fullVaccineService.getFullVaccines();
+//        return new ResponseEntity<>(_fullVaccine, HttpStatus.OK);
+//    }    
     @GetMapping("/list")
-    public ResponseEntity<List<FullVaccine>> getFullVaccines() {
-        List<FullVaccine> _fullVaccine = fullVaccineService.getFullVaccines();
-        return new ResponseEntity<>(_fullVaccine, HttpStatus.OK);
+    public ResponseEntity<List<CombinolaVaccine>> getFullVaccines() {
+        List<CombinolaVaccine> _fullVaccineDTO = fullVaccineService.getFullVaccines();
+        return new ResponseEntity<>(_fullVaccineDTO, HttpStatus.OK);
     }
     
+    @GetMapping("/{id}")
+    public ResponseEntity<CombinolaVaccine> getFullVaccine(@PathVariable Integer id) {
+        CombinolaVaccine _fullVaccine = fullVaccineService.getFullVaccine(id);        
+        return new ResponseEntity<>(_fullVaccine,HttpStatus.OK);
+    }
+    
+//    @GetMapping("/get_vaccines/{id}")
+//    public ResponseEntity<Collection<Vaccine>> getVaccineList(@PathVariable Integer id) {
+//        FullVaccine _fullVaccine = fullVaccineService.getFullVaccine(id);        
+//        return new ResponseEntity<>(_fullVaccine.getVaccines(),HttpStatus.OK);
+//    }    
     @GetMapping("/get_vaccines/{id}")
     public ResponseEntity<Collection<Vaccine>> getVaccineList(@PathVariable Integer id) {
-        FullVaccine _fullVaccine = fullVaccineService.getFullVaccine(id);        
+        CombinolaVaccine _fullVaccine = fullVaccineService.getFullVaccine(id);        
         return new ResponseEntity<>(_fullVaccine.getVaccines(),HttpStatus.OK);
     }
     
-    @PostMapping("/save")
-    public FullVaccine addFullVaccine(@RequestBody FullVaccine fullVaccine) {
-        return fullVaccineService.addFullVaccine(fullVaccine);
+    @GetMapping("/get_vaccinesIds/{id}")
+    public ResponseEntity<Collection<Vaccine>> getVaccinesList(@PathVariable Integer id) {
+        return new ResponseEntity<>(fullVaccineService.getVaccines(id),HttpStatus.OK);
     }
     
-//    @PostMapping("/save_compatibles_vaccines")
-//    public void addVaccineList(Set<Vaccine> vaccines) {
-//        vaccines.forEach(vaccine -> {
-//            vaccine.getId();
-//        });        
+//    @PostMapping("/save")
+//    public ResponseEntity<?> addFullVaccine(@RequestBody FullVaccine fullVaccine) {
+//        FullVaccine _fullVaccine = fullVaccineService.addFullVaccine(fullVaccine);
+//        return ResponseEntity.ok(new MessageResponse(
+//            "Vaccine was successfully added"));
 //    }
-    
-    @PutMapping("/update")
-    public FullVaccine updateFullVaccine(@RequestBody FullVaccine fullVaccine) {
-        return fullVaccineService.updateFullVaccine(fullVaccine);
+    @PostMapping()
+    public ResponseEntity<?> addFullVaccine(@RequestBody CombinolaVaccine dtoFullVaccine) {
+        FullVaccine _fullVaccine = fullVaccineService.addFullVaccine(dtoFullVaccine);
+        return ResponseEntity.ok(new MessageResponse(
+            "Vaccine was successfully added"));
     }
     
-    @DeleteMapping("/delete/{id}")
+    @PostMapping("/save_compatibles_vaccines")
+    public void addVaccineList(Set<Vaccine> vaccines) {
+        vaccines.forEach(vaccine -> {
+            vaccine.getId();
+        });        
+    }
+    
+    @PutMapping()
+    public ResponseEntity<?> updateFullVaccine(@RequestBody CombinolaVaccine dtoFullVaccine) {
+        FullVaccine _fullVaccine = fullVaccineService.updateFullVaccine(dtoFullVaccine);
+            return ResponseEntity.ok(new MessageResponse(
+                    "Vaccine was successfully updated"));
+    }
+    
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFullVaccine(@PathVariable Integer id) {
         fullVaccineService.deleteFullVaccine(id);
         return ResponseEntity.ok(new MessageResponse(

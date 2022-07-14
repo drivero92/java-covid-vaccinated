@@ -4,9 +4,11 @@
  */
 package com.vaccination.restapi.services;
 
+import com.vaccination.restapi.combinolas.CombinolaVaccine;
 import com.vaccination.restapi.exception.ApiNoContentException;
 import com.vaccination.restapi.exception.ApiNotFoundException;
 import com.vaccination.restapi.exception.ApiRequestException;
+import com.vaccination.restapi.mappers.VaccineConverter;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.repository.VaccineRepository;
 
@@ -25,6 +27,11 @@ public class VaccineService {
     @Autowired
     VaccineRepository vaccineRepository;
     
+    private VaccineConverter vaccineConverter;
+    VaccineService (VaccineConverter vaccineConverter) {
+        this.vaccineConverter = vaccineConverter;
+    }
+    
     //Return a list of vaccines
     public List<Vaccine> getVaccines() {
          List<Vaccine> _vaccineList = vaccineRepository.findAll();
@@ -42,6 +49,12 @@ public class VaccineService {
                 .orElseThrow(() -> new ApiNotFoundException(
                         "Vaccine id : "+id+" is not found"));
     }
+//    public CombinolaVaccine getVaccine(Integer id) {
+//        Vaccine _vaccine = vaccineRepository.findById(id)
+//                .orElseThrow(() -> new ApiNotFoundException(
+//                        "Vaccine id : "+id+" is not found"));
+//        return vaccineConverter.entityToDTO(_vaccine);
+//    }
     
     //Adds the vaccine to the repository and returns the vaccine with its own id
     public Vaccine addVaccine(Vaccine vaccine) {
