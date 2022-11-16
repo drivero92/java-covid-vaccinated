@@ -4,6 +4,9 @@
  */
 package com.vaccination.restapi.exception;
 
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+
 /**
  *
  * @author daniel
@@ -11,7 +14,7 @@ package com.vaccination.restapi.exception;
 //This class is the custom exception
 public class ApiRequestException extends RuntimeException {
     
-    //These methods is created with Alt+Enter choose "Constructor"
+    //These methods is created with Alt+Ins(0) choose "Constructor"
 
     public ApiRequestException(String message) {
         super(message);

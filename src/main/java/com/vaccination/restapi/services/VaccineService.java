@@ -4,13 +4,14 @@
  */
 package com.vaccination.restapi.services;
 
-import com.vaccination.restapi.combinolas.CombinolaVaccine;
+import com.vaccination.restapi.dtos.FullVaccineDTO;
 import com.vaccination.restapi.exception.ApiNoContentException;
 import com.vaccination.restapi.exception.ApiNotFoundException;
 import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.mappers.VaccineConverter;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.repository.VaccineRepository;
+import java.sql.SQLException;
 
 import java.util.List;
 
@@ -26,11 +27,6 @@ public class VaccineService {
     
     @Autowired
     VaccineRepository vaccineRepository;
-    
-    private VaccineConverter vaccineConverter;
-    VaccineService (VaccineConverter vaccineConverter) {
-        this.vaccineConverter = vaccineConverter;
-    }
     
     //Return a list of vaccines
     public List<Vaccine> getVaccines() {
@@ -49,12 +45,6 @@ public class VaccineService {
                 .orElseThrow(() -> new ApiNotFoundException(
                         "Vaccine id : "+id+" is not found"));
     }
-//    public CombinolaVaccine getVaccine(Integer id) {
-//        Vaccine _vaccine = vaccineRepository.findById(id)
-//                .orElseThrow(() -> new ApiNotFoundException(
-//                        "Vaccine id : "+id+" is not found"));
-//        return vaccineConverter.entityToDTO(_vaccine);
-//    }
     
     //Adds the vaccine to the repository and returns the vaccine with its own id
     public Vaccine addVaccine(Vaccine vaccine) {
@@ -62,20 +52,30 @@ public class VaccineService {
     }
     
     //This will update the vaccine properties but not the id
-    public Vaccine updateVaccine(Vaccine newVaccine) {
-        if(vaccineRepository.existsById(newVaccine.getId())) {
-            return vaccineRepository.save(newVaccine);
+    public Vaccine updateVaccine(Vaccine vaccine) {
+        if (vaccine.getId() != null) {
+            if (vaccineRepository.existsById(vaccine.getId())) {
+                return vaccineRepository.save(vaccine);
+            } else {
+                throw new ApiNotFoundException(
+                        "It does not exist the vaccine: " + vaccine.getId());
+            }
         } else {
-            throw new ApiNotFoundException(
-                    "It does not exist the vaccine: "+ newVaccine.getId());
+            throw new ApiRequestException(
+                    "The given vaccine id must not be null");
         }
-        
     }
     
     //Delete the vaccine by id
     public void deleteVaccine(Integer id) {
         if (vaccineRepository.existsById(id)) {
-            vaccineRepository.deleteById(id);
+            try {
+                vaccineRepository.deleteById(id);
+            } catch (RuntimeException e) {
+                throw new ApiRequestException(
+                        "There is a reference to this in another part");
+            }
+            
         } else {
             throw new ApiNotFoundException(
                     "It does not exist the vaccine with id: "+ id);
@@ -83,14 +83,12 @@ public class VaccineService {
     }
     
     //Reduces the amount of the vaccine by one unit
-    public void reduceQuantity(Vaccine v) {
-        Integer _quantity = v.getQuantity();
-        if (_quantity>0) {
-            _quantity--;
-            v.setQuantity(_quantity);
-            vaccineRepository.save(v);
+    public void reduceQuantity(Integer vaccineId, Integer quantity) {
+        if (quantity>0) {
+            quantity--;
+            vaccineRepository.reduceVaccineQuantityById(vaccineId, quantity);
         } else {
             throw new ApiRequestException("Vaccines sold out");
-        }        
+        }
     }
 }

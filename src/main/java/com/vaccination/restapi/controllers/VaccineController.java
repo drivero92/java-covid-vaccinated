@@ -4,7 +4,7 @@
  */
 package com.vaccination.restapi.controllers;
 
-import com.vaccination.restapi.combinolas.CombinolaVaccine;
+import com.vaccination.restapi.dtos.FullVaccineDTO;
 import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.models.FullVaccine;
@@ -43,14 +43,14 @@ public class VaccineController {
     @Autowired
     VaccineService vaccineService;
     
-    //Returns the vaccine list
+    //Returns a vaccine list
     @GetMapping("/list")
     public ResponseEntity<List<Vaccine>> getVaccines() {
         List<Vaccine> _vaccineList = vaccineService.getVaccines();
         return new ResponseEntity<>(_vaccineList, HttpStatus.OK);
     }
     
-//    //Returns the vaccine from service
+    //Returns a vaccine from service
     @GetMapping("/{id}")
     public ResponseEntity<Vaccine> getVaccineById(@PathVariable Integer id) {
         Vaccine _vaccine = vaccineService.getVaccine(id);
@@ -58,11 +58,11 @@ public class VaccineController {
     }
 //    @GetMapping("/{id}")
 //    public ResponseEntity<CombinolaVaccine> getVaccineById(@PathVariable Integer id) {
-//        CombinolaVaccine _vaccine = vaccineService.getVaccine(id);
+//        FullVaccineDTO _vaccine = vaccineService.getVaccine(id);
 //        return new ResponseEntity<>(_vaccine, HttpStatus.OK);
 //    }
     
-    //Returns the vaccine from service
+    //Returns a vaccine from service
     @GetMapping("/full_vaccines/{id}")
     public ResponseEntity<Collection<FullVaccine>> getFullVaccinesById(@PathVariable Integer id) {
         Vaccine _vaccine = vaccineService.getVaccine(id);
@@ -81,12 +81,13 @@ public class VaccineController {
             return ResponseEntity.badRequest().body(new MessageResponse(message));
         } else {
             Vaccine _vaccine = vaccineService.addVaccine(vaccine);
-            return ResponseEntity.ok(new MessageResponse(
-                "Vaccine was successfully added", _vaccine));
+//            return ResponseEntity.ok(new MessageResponse(
+//                "Vaccine was successfully added", _vaccine));
+            return new ResponseEntity<>(_vaccine, HttpStatus.OK);
         }        
     }
     
-    //Updates the vaccine
+    //Updates a vaccine
     @PutMapping()
     public ResponseEntity<?> updateVaccine(@Valid @RequestBody Vaccine vaccine, BindingResult result) {
         if (result.hasErrors()) {
@@ -97,8 +98,9 @@ public class VaccineController {
             return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", _errors)));
         } else {
             Vaccine _vaccine = vaccineService.updateVaccine(vaccine);
-            return ResponseEntity.ok(new MessageResponse(
-                    "Vaccine was successfully updated", _vaccine));
+//            return ResponseEntity.ok(new MessageResponse(
+//                    "Vaccine was successfully updated", _vaccine));
+            return new ResponseEntity<>(_vaccine, HttpStatus.OK);
         }
     }
     

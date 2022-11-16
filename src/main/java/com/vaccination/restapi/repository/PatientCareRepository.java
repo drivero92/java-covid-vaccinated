@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -22,23 +24,38 @@ import org.springframework.stereotype.Repository;
 public interface PatientCareRepository extends JpaRepository<PatientCare, Integer>{
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "
-                    + "WHERE fk_patient=:id "
-                    + "AND id=(SELECT MAX(id) FROM patient_vaccine WHERE fk_patient=:id)", nativeQuery = true)
+                    + "WHERE patient_id=:id "
+                    + "AND patient_care_id=(SELECT MAX(patient_care_id) FROM patient_vaccine WHERE patient_id=:id)", nativeQuery = true)
     Optional<PatientCare> findByPatientId(@Param("id") Integer id);
     
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "
-                    + "WHERE fk_patient=:id", nativeQuery = true)
+                    + "WHERE patient_id=:id", nativeQuery = true)
     List<PatientCare> findPCsByPatientId(@Param("id") Integer id);
     
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "
-                    + "WHERE fk_vaccine=:id "
-                    + "ORDER BY fk_patient ASC", nativeQuery = true)
+                    + "WHERE vaccine_id=:id "
+                    + "ORDER BY patient_id ASC", nativeQuery = true)
     List<PatientCare> findPCsByVaccineId(@Param("id") Integer id);
     
     @Query(value =  "SELECT * "
                     + "FROM patient_vaccine "
                     + "WHERE dose=:doses ", nativeQuery = true)
     List<PatientCare> findPCsByDose(@Param("doses") Byte dose);
+    
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(value =  "DELETE FROM patient_vaccine "
+                    + "WHERE vaccine_id=:id", nativeQuery = true)
+    void removePatientCaresByVaccineId(Integer id);
+    
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(value = "DELETE FROM patient_vaccine "
+                    + "WHERE patient_id=:id", nativeQuery = true)
+    void removePatientCaresByPatientId(Integer id);
+    
+    boolean existsByPatientId(Integer id);
+    boolean existsByVaccineId(Integer id);
 }

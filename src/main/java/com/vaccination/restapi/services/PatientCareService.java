@@ -4,9 +4,14 @@
  */
 package com.vaccination.restapi.services;
 
+import com.vaccination.restapi.dtos.FullVaccineDTO;
+import com.vaccination.restapi.dtos.PatientCareDTO;
 import com.vaccination.restapi.exception.ApiNoContentException;
 import com.vaccination.restapi.exception.ApiNotFoundException;
 import com.vaccination.restapi.exception.ApiRequestException;
+import com.vaccination.restapi.mappers.PatientCareConverter;
+import com.vaccination.restapi.mappers.VaccineConverter;
+import com.vaccination.restapi.models.FullVaccine;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.repository.PatientCareRepository;
 import com.vaccination.restapi.models.PatientCare;
@@ -14,8 +19,10 @@ import com.vaccination.restapi.payload.response.MessageResponse;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,88 +36,127 @@ public class PatientCareService{
     PatientCareRepository patientCareRepository;
     
     @Autowired
-    VaccineService vacccineService;
+    VaccineService vaccineService;
+    
+    @Lazy
+    @Autowired
+    FullVaccineService fullVaccineService;
+    
+    @Autowired
+    private PatientCareConverter patientCareConverter;
     
     //Returns a patients care list from repository
-    public List<PatientCare> getPatientCares() {
-        List<PatientCare> _patientCareList = patientCareRepository.findAll();
-        if (_patientCareList.isEmpty()) {
+//    public List<PatientCare> getPatientCares() {
+//        List<PatientCare> _patientCareList = patientCareRepository.findAll();
+//        if (_patientCareList.isEmpty()) {
+//            throw new ApiNoContentException("The patient care list has no content");
+//        } else {
+//            return _patientCareList;
+//        }
+//    }
+    public List<PatientCareDTO> getPatientCares() {
+        List<PatientCare> _patientCares = patientCareRepository.findAll();
+        if (_patientCares.isEmpty()) {
             throw new ApiNoContentException("The patient care list has no content");
         } else {
-            return _patientCareList;
+            return patientCareConverter.entitiesToDTOs(_patientCares);
         }
     }
     
     //Returns a patient care by id from repository
-    public PatientCare getPatientCare(Integer id) {
-        return patientCareRepository.findById(id)
+//    public PatientCare getPatientCare(Integer id) {
+//        return patientCareRepository.findById(id)
+//                .orElseThrow(() -> new ApiNotFoundException(
+//                        "The patient care id: "+id+" is not found"));
+//    }
+    public PatientCareDTO getPatientCare(Integer id) {
+        PatientCare _patientCare = patientCareRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException(
                         "The patient care id: "+id+" is not found"));
+        return patientCareConverter.entityToDTO(_patientCare);
     }
     
     //Returns a list of patient cares (PCs) by the patient id and the doses
-    public List<PatientCare> getPCsByPatientId(Integer id) {
+//    public List<PatientCare> getPCsByPatientId(Integer id) {
+//        List<PatientCare> _patientCare = patientCareRepository.findPCsByPatientId(id);
+//        if (_patientCare.isEmpty()) {
+//            throw new ApiNoContentException(
+//                    "The list of patient cares of the patient id: "+ id +" has no content");
+//        } else {
+//            return _patientCare;
+//        }
+//    }
+    public List<PatientCareDTO> getPCsByPatientId(Integer id) {
         List<PatientCare> _patientCare = patientCareRepository.findPCsByPatientId(id);
         if (_patientCare.isEmpty()) {
             throw new ApiNoContentException(
                     "The list of patient cares of the patient id: "+ id +" has no content");
         } else {
-            return _patientCare;
+            return patientCareConverter.entitiesToDTOs(_patientCare);
         }
     }
     
     //Returns a patient care by the patient id
-    public PatientCare getPatientCareByPatientId(Integer id) {
-        return patientCareRepository.findByPatientId(id)
+    public PatientCareDTO getPatientCareByPatientId(Integer id) {
+        PatientCare _patientCare = patientCareRepository.findByPatientId(id)
                 .orElse(null);
+        return patientCareConverter.entityToDTO(_patientCare);
     }
     
     //Returns a patient care by the vaccine id
-    public List<PatientCare> getPCsByVaccineId(Integer id) {
+    public List<PatientCareDTO> getPCsByVaccineId(Integer id) {
         List<PatientCare> _patientCare = patientCareRepository.findPCsByVaccineId(id);
         if (_patientCare.isEmpty()) {
             throw new ApiNoContentException(
-                    "It doesnot exist the patient cares list with vaccine id: "+ id);
+                    "It does not exist the patient cares list with vaccine id: "+ id);
         } else {
-            return _patientCare;
+            return patientCareConverter.entitiesToDTOs(_patientCare);
         }
     }
     
-    //
-    public List<PatientCare> getPCsByDose(Byte dose) {
+    //Returns a list of vaccines that have the same number of Doses
+    public List<PatientCareDTO> getPCsByDose(Byte dose) {
         List<PatientCare> _patientCare = patientCareRepository.findPCsByDose(dose);
         if (_patientCare.isEmpty()) {
             throw new ApiNoContentException(
-                    "It doesnot exist the patient cares list with dose: "+ dose);
+                    "It does not exist the patient cares list with dose: "+ dose);
         } else {
-            return _patientCare;
+            return patientCareConverter.entitiesToDTOs(_patientCare);
         }
     }
     
     //Update a patient's care and return it
-    public PatientCare updatePatientCare(PatientCare pc) {
-        if (patientCareRepository.existsById(pc.getId())) {
-            return patientCareRepository.save(pc);
+    public PatientCareDTO updatePatientCare(PatientCare pc) {
+        if (pc.getId() != null) {
+            if (patientCareRepository.existsById(pc.getId())) {
+                PatientCare _patientCare = patientCareRepository.save(pc);
+                return patientCareConverter.entityToDTO(_patientCare);
+            } else {
+                throw new ApiNotFoundException(
+                        "It does not exist the patient care with id: " + pc.getId());
+            }
         } else {
-            throw new ApiNotFoundException(
-                    "It does not exist the patient care with id: "+ pc.getId());
+            throw new ApiRequestException(
+                    "The given patient care id must not be null");
         }
     }
 
-    public PatientCare addPatientCare(PatientCare pc) {
-        return patientCareRepository.save(pc);
+    public PatientCareDTO addPatientCare(PatientCare pc) {
+        PatientCare _patientCare = patientCareRepository.save(pc);
+        return patientCareConverter.entityToDTO(_patientCare);
     }
     
-    public PatientCare addManagedPatientCare(PatientCare pc) {        
-        PatientCare _pc = null;
+    public PatientCareDTO addManagedPatientCare(PatientCareDTO patientCareDTO) {
+        PatientCare pc = patientCareConverter.dtoToEntity(patientCareDTO);
+        PatientCareDTO _pc = null;
         LocalDate comeBackDate = null;
-        Vaccine _vaccine = vacccineService.getVaccine(pc.getVaccineId());
-        PatientCare _patientCare = this.getPatientCareByPatientId(pc.getPatientId());
+        FullVaccineDTO _fullVaccineDTO = fullVaccineService.getFullVaccine(pc.getVaccineId());
+        PatientCareDTO _patientCare = this.getPatientCareByPatientId(pc.getPatientId());
         if(_patientCare!=null) {
         comeBackDate = LocalDate.of(_patientCare.getDoseDate().getYear(),
                                                       _patientCare.getDoseDate().getMonth(),
                                                       _patientCare.getDoseDate().getDayOfMonth()
-                                            ).plusDays(_vaccine.getRestDays());
+                                            ).plusDays(_fullVaccineDTO.getRestDays());
         }
         //Checks if he is the first time for vaccinated
         if(pc.getDose() > 1) {
@@ -122,13 +168,12 @@ public class PatientCareService{
                         //Check if the patient has taken enough rest
                         if(pc.getDoseDate().isAfter(comeBackDate)) {
                             //Checks if is the same vaccine brand
-                            if(_patientCare.getVaccine().getName() == null ? _vaccine.getName() == null : 
-                                    _patientCare.getVaccine().getName().equals(_vaccine.getName())) {
-                                if(pc.getDose().equals(_vaccine.getNumberDoses())) {
+                            if(_patientCare.getVaccine().getName() == null ? _fullVaccineDTO.getName() == null : 
+                                    _patientCare.getVaccine().getName().equals(_fullVaccineDTO.getName())) {
+                                if(pc.getDose().equals(_fullVaccineDTO.getNumberDoses())) {
                                     pc.setCompleteDose(true);
                                 }
-                                vacccineService.reduceQuantity(_vaccine);
-                                //throw new MessageResponse("hola");
+                                fullVaccineService.reduceQuantity(_fullVaccineDTO);
                                 _pc = addPatientCare(pc);
                             } else {
                                 throw new ApiRequestException(
@@ -154,10 +199,10 @@ public class PatientCareService{
                     throw new ApiRequestException("The patient has already been vaccinated with the first dose.");
                 } else {
                     if (_patientCare.isCompleteDose()) {
-                        if(compatibleVaccines(pc.getVaccineId(),_patientCare.getVaccine())) {
+                        if(fullVaccineService.compatibleVaccines(pc.getVaccineId(),_patientCare.getVaccine())) {
                             if (pc.getDoseDate().isAfter(comeBackDate)) {
                                 pc.setCompleteDose(true);
-                                vacccineService.reduceQuantity(_vaccine);
+                                fullVaccineService.reduceQuantity(_fullVaccineDTO);
                                 _pc = addPatientCare(pc);
                             } else {
                                 throw new ApiRequestException(
@@ -172,7 +217,7 @@ public class PatientCareService{
                     }
                 }
             } else {
-                vacccineService.reduceQuantity(_vaccine);
+                fullVaccineService.reduceQuantity(_fullVaccineDTO);
                 _pc = addPatientCare(pc);
             }                
         }
@@ -189,20 +234,10 @@ public class PatientCareService{
         }
     }
     
-    public boolean compatibleVaccines(Integer vaccine1, Vaccine vaccine2) {
-        boolean resp = false;
-        //First vaccine Sputnik: 6 and booster dose is AstraZeneca: 5
-        if (vaccine1 == 5 && vaccine2.getId() == 6) {
-            resp = true;
+    public void deletePatientCareByVaccineId(Integer id) {
+        //Revisar si es realmente necesario verificar que exista
+        if (patientCareRepository.existsByVaccineId(id)) {
+            patientCareRepository.removePatientCaresByVaccineId(id);
         }
-        //First vaccine AstraZeneca: 5 and booster dose is Moderna: 1
-        if (vaccine1 == 4 && vaccine2.getId() == 5) {
-            resp = true;
-        }
-        //First vaccine Sinopharm: 7 and booster dose is Pfizer: 2
-        if (vaccine1 == 2 && vaccine2.getId() == 7) {
-            resp = true;
-        }
-        return resp;
     }
 }

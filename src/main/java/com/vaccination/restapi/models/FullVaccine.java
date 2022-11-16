@@ -7,6 +7,7 @@ package com.vaccination.restapi.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,10 +36,10 @@ public class FullVaccine {
     @Column(name = "full_vaccine_id", unique = true)
     private Integer id;
     
-    @Column(name = "fk_vaccine", insertable = false, updatable = false)
+    @Column(name = "vaccine_id", insertable = false, updatable = false)
     private Integer vaccineId;//CHECK, maybe never used
     
-    @JoinColumn(name = "fk_vaccine")
+    @JoinColumn(name = "vaccine_id")
     @OneToOne(cascade = CascadeType.MERGE)
     private Vaccine vaccine;
     
@@ -92,7 +93,10 @@ public class FullVaccine {
     }
     
     public void removeVaccine(Integer vaccineId) {
-        Vaccine _vaccine = this.vaccines.stream().filter(t -> t.getId() == vaccineId).findFirst().orElse(null);
+        Vaccine _vaccine = this.vaccines.stream()
+                                        .filter(t -> Objects.equals(t.getId(), vaccineId))
+                                        .findFirst()
+                                        .orElse(null);
         if (_vaccine != null) {
             this.vaccines.remove(_vaccine);
             _vaccine.getFullVaccines().remove(this);

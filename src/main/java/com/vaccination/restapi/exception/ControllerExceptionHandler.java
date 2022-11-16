@@ -6,6 +6,7 @@ package com.vaccination.restapi.exception;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import org.hibernate.exception.ConstraintViolationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class ControllerExceptionHandler {
     }
     
     @ExceptionHandler(value = {ApiNotFoundException.class})
-    public ResponseEntity<Object> handleApiNotFoundtException(ApiNotFoundException e) {
+    public ResponseEntity<Object> handleApiNotFoundException(ApiNotFoundException e) {
         HttpStatus notFound = HttpStatus.NOT_FOUND;
         
         ErrorMessage errorMessage = new ErrorMessage(

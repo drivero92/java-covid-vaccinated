@@ -31,4 +31,28 @@ public interface FullVaccineRepository extends JpaRepository<FullVaccine, Intege
                     + "DELETE FROM compatible_vaccines "
                     + "WHERE full_vaccine_id=:id AND vaccine_id IN (SELECT vaccine_id FROM rows)", nativeQuery = true)
     void removeRowsByRequiredAmountVaccines(Integer id, @Param("size") Integer size);
+    
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(value =  "DELETE FROM compatible_vaccines "
+                    + "WHERE full_vaccine_id=:id", nativeQuery = true)
+    void removeByFullVaccineId(Integer id);
+    
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(value =  "DELETE FROM compatible_vaccines "
+                    + "WHERE vaccine_id=:id", nativeQuery = true)
+    void removeByVaccineId(Integer id);
+    
+    @Transactional
+    @Query(value =  "SELECT CASE WHEN EXISTS"
+                    + "(SELECT * FROM compatible_vaccines "
+                    + "WHERE full_vaccine_id IN "
+                    + "(SELECT full_vaccine_id "
+                    + "FROM compatible_vaccines "
+                    + "WHERE full_vaccine_id='2' "
+                    + "OR vaccine_id='2')) "
+                    + "THEN 1 ELSE 0 END "
+                    + "FROM compatible_vaccines", nativeQuery = true)
+    boolean existsByFullandVaccineId(Integer id);
 }

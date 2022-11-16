@@ -8,10 +8,8 @@ import com.vaccination.restapi.services.PatientService;
 import com.vaccination.restapi.models.Patient;
 import com.vaccination.restapi.payload.response.MessageResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import java.util.List;
-import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +47,14 @@ public class PatientController {
     }
     
     //Returns one patient
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatient(@PathVariable Integer id) {
         Patient _patient = patientService.getPatient(id);
         return new ResponseEntity<>(_patient, HttpStatus.OK);
     }
     
     //Adds a new patient
-    @PostMapping("/save")
+    @PostMapping()
     public ResponseEntity<?> addPatient(@Valid @RequestBody Patient patient, BindingResult result) {
         if (result.hasErrors()) {
             List<String> _errors = new ArrayList<>();
@@ -73,7 +71,7 @@ public class PatientController {
     }
     
     //Updates the patient
-    @PutMapping("/update")
+    @PutMapping()
     public ResponseEntity<?> updatePatient(@Valid @RequestBody Patient patient, BindingResult result) {
         if (result.hasErrors()) {
             List<String> _errors = new ArrayList<>();
@@ -90,7 +88,7 @@ public class PatientController {
     
     //Deletes a patient
     //@param Integer id
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePatient(@PathVariable Integer id) {
         patientService.deletePatient(id);
         return ResponseEntity.ok(new MessageResponse(

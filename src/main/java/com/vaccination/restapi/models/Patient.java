@@ -25,23 +25,23 @@ public class Patient {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true)
+    @Column(unique = true, name = "patient_id")
     private Integer id;
 
     @Positive(message = "Patient's ID must be greater than zero.")
     @NotNull(message = "The patient's ID card must not be empty.")
     private Integer ci;
     
-    @Pattern(regexp = "^[a-zA-Z ]+$",message = "The patient's name must contain text only")
-    @NotBlank(message = "The patient's name must not be left blank")
+    @Pattern(regexp = "^[a-zA-Z ]+$",message = "The patient's name must contain text only.")
+    @NotBlank(message = "The patient's name must not be left blank.")
     private String name;
     
-    @Pattern(regexp = "^[a-zA-Z ]+$",message = "The patient's last name must contain text only")
-    @NotBlank(message = "The patient's last name must not be left blank")
+    @Pattern(regexp = "^[a-zA-Z ]+$",message = "The patient's last name must contain text only.")
+    @NotBlank(message = "The patient's last name must not be left blank.")
     private String lastName;
 
-    @Positive(message = "Patient's age must be greater than zero")
-    @NotNull(message = "The patient's age must not be empty")
+    @Positive(message = "Patient's age must be greater than zero.")
+    @NotNull(message = "The patient's age must not be empty.")
     private Byte age;
     
     public Patient() {

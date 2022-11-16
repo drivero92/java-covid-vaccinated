@@ -4,53 +4,55 @@
  */
 package com.vaccination.restapi.mappers;
 
-import com.vaccination.restapi.combinolas.CombinolaVaccine;
+import com.vaccination.restapi.dtos.FullVaccineDTO;
 import com.vaccination.restapi.models.FullVaccine;
 import com.vaccination.restapi.models.Vaccine;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author daniel
  */
-@SpringBootApplication
+@Component
 public class VaccineConverter {
     private static final ModelMapper modelMapper = new ModelMapper();
+
+    public VaccineConverter() {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);        
+        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
+    }
     
-    public List<CombinolaVaccine> entitiesToDTOs(List<FullVaccine> fullVaccines) {
+    public List<FullVaccineDTO> entitiesToDTOs(List<FullVaccine> fullVaccines) {
         return fullVaccines.stream()
-                            .map(_fullVaccine -> modelMapper.typeMap(FullVaccine.class, CombinolaVaccine.class)
-                                                    .addMapping(m->m.getVaccine(),CombinolaVaccine::setVaccine)
-                                                    .addMapping(m->m.getVaccines(),CombinolaVaccine::setVaccines)
-                                                    .map(_fullVaccine))
+                            .map(fullVaccine -> modelMapper.typeMap(FullVaccine.class, FullVaccineDTO.class)
+                                                    .addMapping(map -> map.getVaccine(),FullVaccineDTO::setVaccine)
+                                                    .addMapping(map -> map.getVaccines(),FullVaccineDTO::setVaccines)
+                                                    .map(fullVaccine))
                             .collect(Collectors.toList());
     }
     
-    public CombinolaVaccine entityToDTO(FullVaccine fullVaccine) {
-        return modelMapper.typeMap(FullVaccine.class, CombinolaVaccine.class)
-                            .addMapping(map -> map.getVaccine(),CombinolaVaccine::setVaccine)
-                            .addMapping(map -> map.getVaccines(),CombinolaVaccine::setVaccines)
+    public FullVaccineDTO entityToDTO(FullVaccine fullVaccine) {
+        return  fullVaccine == null ? null : modelMapper.typeMap(FullVaccine.class, FullVaccineDTO.class)
+                            .addMapping(map -> map.getVaccine(),FullVaccineDTO::setVaccine)
+                            .addMapping(map -> map.getVaccines(),FullVaccineDTO::setVaccines)
                             .map(fullVaccine);
     }
     
-    public FullVaccine dtoToEntity(CombinolaVaccine dtoFullVaccine) {
-        Vaccine _vaccine = new Vaccine();
+    public FullVaccine dtoToEntity(FullVaccineDTO fullVaccineDTO) {
         FullVaccine _fullVaccine = new FullVaccine();
-        _fullVaccine.setId(dtoFullVaccine.getId());
-        _fullVaccine.setVaccineId(dtoFullVaccine.getId());
-        _vaccine.setId(dtoFullVaccine.getId());
-        _vaccine.setName(dtoFullVaccine.getName());
-        _vaccine.setQuantity(dtoFullVaccine.getQuantity());
-        _vaccine.setRestDays(dtoFullVaccine.getRestDays());
-        _vaccine.setNumberDoses(dtoFullVaccine.getNumberDoses());
+        _fullVaccine.setId(fullVaccineDTO.getId());
+        _fullVaccine.setVaccineId(fullVaccineDTO.getId());
+        Vaccine _vaccine = modelMapper.map(fullVaccineDTO, Vaccine.class);
         _fullVaccine.setVaccine(_vaccine);
-        _fullVaccine.setVaccines(dtoFullVaccine.getVaccines());
+        _fullVaccine.setVaccines(fullVaccineDTO.getVaccines());
         return _fullVaccine;
     }
 }

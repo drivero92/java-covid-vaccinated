@@ -16,7 +16,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-
 /**
  *
  * @author daniel
@@ -27,52 +26,52 @@ public class PatientCare {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true)
+    @Column(unique = true, name = "patient_care_id")
     private Integer id;
     
-    @Column(name = "fk_patient")
-    @NotNull(message = "Patient must not be empty")
+    @Column(name = "patient_id")
+    @NotNull(message = "Patient must not be empty.")
     private Integer patientId;
     
-    @JoinColumn(name = "fk_patient", insertable = false, updatable = false)
+    @JoinColumn(name = "patient_id", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)//Merge funciona para actualizar los otros objetos vacuna y paciente pero baja la seguridad al actualizar en pc
     private Patient patient;
     
-    @Column(name = "fk_vaccine")
-    @NotNull(message = "Vaccine must not be empty")
+    @Column(name = "vaccine_id")
+    @NotNull(message = "Vaccine must not be empty.")
     private Integer vaccineId;
     
-    @JoinColumn(name = "fk_vaccine", insertable = false, updatable = false)
+    @JoinColumn(name = "vaccine_id", insertable = false, updatable = false)
     @OneToOne(cascade = CascadeType.MERGE)
-    private Vaccine vaccine;
+    private FullVaccine vaccine;
     
-    @Positive(message = "Dose must be greater than zero")
-    @NotNull(message = "Dose must be greater than zero")
+    @Positive(message = "Dose must be greater than zero.")
+    @NotNull(message = "Dose must be greater than zero.")
     private Byte dose;
     
-    @NotNull(message = "Dose date must not be null")
+    @NotNull(message = "Dose date must not be null.")
     private LocalDate doseDate;
     
     private boolean completeDose;
 
     public PatientCare() {
     }
-
-    public PatientCare( Patient patient, 
-                        Integer patientId, 
-                        Vaccine vaccine, 
+    
+    public PatientCare( Integer patientId, 
+                        Patient patient, 
                         Integer vaccineId, 
+                        FullVaccine vaccine, 
                         Byte dose, 
-                        LocalDate doseDate,
+                        LocalDate doseDate, 
                         boolean completeDose) {
-        this.patient = patient;
         this.patientId = patientId;
-        this.vaccine = vaccine;
+        this.patient = patient;
         this.vaccineId = vaccineId;
+        this.vaccine = vaccine;
         this.dose = dose;
         this.doseDate = doseDate;
         this.completeDose = completeDose;
-    }
+    }    
 
     public Integer getId() {
         return id;
@@ -97,7 +96,7 @@ public class PatientCare {
     public void setVaccineId(Integer vaccineId) {
         this.vaccineId = vaccineId;
     }
-
+    
     public Patient getPatient() {
         return patient;
     }
@@ -105,15 +104,15 @@ public class PatientCare {
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
-
-    public Vaccine getVaccine() {
-        return vaccine;
+    
+    public FullVaccine getVaccine() {
+        return this.vaccine;
     }
-
-    public void setVaccine(Vaccine vaccine) {
+    
+    public void setVaccine(FullVaccine vaccine) {
         this.vaccine = vaccine;
     }
-
+    
     public Byte getDose() {
         return dose;
     }
@@ -136,10 +135,6 @@ public class PatientCare {
 
     public void setCompleteDose(boolean completeDose) {
         this.completeDose = completeDose;
-    }
-
-    public PatientCare get() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
 }

@@ -4,6 +4,7 @@
  */
 package com.vaccination.restapi.controllers;
 
+import com.vaccination.restapi.dtos.PatientCareDTO;
 import com.vaccination.restapi.services.PatientCareService;
 import com.vaccination.restapi.models.PatientCare;
 import com.vaccination.restapi.payload.response.MessageResponse;
@@ -44,50 +45,65 @@ public class PatientCareController {
     VaccineService vacccineService;
     
     //Return patients who are vaccinated
+//    @GetMapping("/list")
+//    public ResponseEntity<List<PatientCare>> getPatientCares() {
+//        List<PatientCare> _patientCareList = patientCareService.getPatientCares();
+//        return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
+//    }
     @GetMapping("/list")
-    public ResponseEntity<List<PatientCare>> getPatientCares() {
-        List<PatientCare> _patientCareList = patientCareService.getPatientCares();
-        return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
+    public ResponseEntity<List<PatientCareDTO>> getPatientCares() {
+        List<PatientCareDTO> _patientCaresListDTO = patientCareService.getPatientCares();
+        return new ResponseEntity<>(_patientCaresListDTO, HttpStatus.OK);
     }
     
     //Return a specific patient vaccinated
-    @GetMapping("/get/{patientCareId}")
-    public ResponseEntity<PatientCare> getPatientCare(@PathVariable("patientCareId") Integer id) {
-        PatientCare _patientCare = patientCareService.getPatientCare(id);
-        return new ResponseEntity<>(_patientCare, HttpStatus.OK);
+//    @GetMapping("/get/{patientCareId}")
+//    public ResponseEntity<PatientCare> getPatientCare(@PathVariable("patientCareId") Integer id) {
+//        PatientCare _patientCare = patientCareService.getPatientCare(id);
+//        return new ResponseEntity<>(_patientCare, HttpStatus.OK);
+//    }
+    @GetMapping("/{patientCareId}")
+    public ResponseEntity<PatientCareDTO> getPatientCare(@PathVariable("patientCareId") Integer id) {
+        PatientCareDTO _patientCareDTO = patientCareService.getPatientCare(id);
+        return new ResponseEntity<>(_patientCareDTO, HttpStatus.OK);
+    }
+    
+    //Returns the patient cares of a specific patient vaccinated
+//    @GetMapping("/list_patient_care/{patientId}")
+//    public ResponseEntity<List<PatientCare>> getPCsByPatientId(@PathVariable("patientId") Integer id) {
+//        List<PatientCare> _patientCareList = patientCareService.getPCsByPatientId(id);
+//        return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
+//    }
+    @GetMapping("/{patientId}/list_patient_care")
+    public ResponseEntity<List<PatientCareDTO>> getPCsByPatientId(@PathVariable("patientId") Integer id) {
+        List<PatientCareDTO> _patientCareListDTO = patientCareService.getPCsByPatientId(id);
+        return new ResponseEntity<>(_patientCareListDTO, HttpStatus.OK);
     }
     
     //Returns a list of specific patient vaccinated
-    @GetMapping("/list_patient_care/{patientId}")
-    public ResponseEntity<List<PatientCare>> getPCsByPatientId(@PathVariable("patientId") Integer id) {
-        List<PatientCare> _patientCareList = patientCareService.getPCsByPatientId(id);
-        return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
+    @GetMapping("/{patientId}/last_patient_care")
+    public ResponseEntity<PatientCareDTO> getLastPCByPatientId(@PathVariable("patientId") Integer id) {
+        PatientCareDTO _patientCareDTO = patientCareService.getPatientCareByPatientId(id);
+        return new ResponseEntity<>(_patientCareDTO, HttpStatus.OK);
     }
     
-    //Returns a list of specific patient vaccinated
-    @GetMapping("/get/last_patient_care_byPatientId/{patientId}")
-    public ResponseEntity<PatientCare> getLastPCByPatientId(@PathVariable("patientId") Integer id) {
-        PatientCare _patientCare = patientCareService.getPatientCareByPatientId(id);
-        return new ResponseEntity<>(_patientCare, HttpStatus.OK);
+    //Returns a patient care list of a patient with the same vaccine
+    @GetMapping("/{vaccineId}/list_vaccines")
+    public ResponseEntity<List<PatientCareDTO>> getPCsByVaccineId(@PathVariable("vaccineId") Integer id) {
+        List<PatientCareDTO> _patientCareListDTO = patientCareService.getPCsByVaccineId(id);
+        return new ResponseEntity<>(_patientCareListDTO, HttpStatus.OK);
     }
     
-    //Returns a list of patients vaccinated with the same vaccine
-    @GetMapping("/list_vaccines_patient_care/{vaccineId}")
-    public ResponseEntity<List<PatientCare>> getPCsByVaccineId(@PathVariable("vaccineId") Integer id) {
-        List<PatientCare> _patientCareList = patientCareService.getPCsByVaccineId(id);
-        return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
-    }
-    
-    //
-    @GetMapping("/list_vaccines_patient_care_byDose/{dose}")
-    public ResponseEntity<List<PatientCare>> getPCsByDose(@PathVariable("dose") Byte dose) {
-        List<PatientCare> _patientCareList = patientCareService.getPCsByDose(dose);
-        return new ResponseEntity<>(_patientCareList, HttpStatus.OK);
+    //Returns a list of vaccines by Dose
+    @GetMapping("/{dose}/list_vaccines_dose")
+    public ResponseEntity<List<PatientCareDTO>> getPCsByDose(@PathVariable("dose") Byte dose) {
+        List<PatientCareDTO> _patientCareListDTO = patientCareService.getPCsByDose(dose);
+        return new ResponseEntity<>(_patientCareListDTO, HttpStatus.OK);
     }
     
     //Add a new vaccinated patient
-    @PostMapping("/save")
-    public ResponseEntity<?> addPatientCare(@Valid @RequestBody PatientCare pc, BindingResult result) {
+    @PostMapping()
+    public ResponseEntity<?> addPatientCare(@Valid @RequestBody PatientCareDTO patientCareDTO, BindingResult result) {
         if (result.hasErrors()) {
             List<String> _errors = new ArrayList<>();
             for (ObjectError allError : result.getAllErrors()) {
@@ -95,15 +111,15 @@ public class PatientCareController {
             }
             return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", _errors)));
         } else {
-        PatientCare _patientCare = patientCareService.addManagedPatientCare(pc);
+        PatientCareDTO _patientCareDTO = patientCareService.addManagedPatientCare(patientCareDTO);
         //Another way to response
         return ResponseEntity.ok(new MessageResponse(
-                "Patient care was successfully added", _patientCare));
+                "Patient care was successfully added", _patientCareDTO));
         }
     }
     
     //Update the patient care
-    @PutMapping("/update")
+    @PutMapping()
     public ResponseEntity<?> updatePatientCare(@RequestBody @Valid PatientCare pc, BindingResult result) {
         if (result.hasErrors()) {
             List<String> errors = new ArrayList<>();
@@ -112,15 +128,15 @@ public class PatientCareController {
             }
             return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", errors)));
         } else {
-            PatientCare _patientCare = patientCareService.updatePatientCare(pc);
+            PatientCareDTO _patientCareDTO = patientCareService.updatePatientCare(pc);
             return ResponseEntity.ok(new MessageResponse(
-                    "Patient care was successfully updated", _patientCare));
+                    "Patient care was successfully updated", _patientCareDTO));
         }        
     }
     
     //Deletes a patient care
     //@param Integer id
-    @DeleteMapping(path = "/delete/{patientCareId}")
+    @DeleteMapping(path = "/{patientCareId}")
     //revisar si esta intentando eliminar un paciente que se vacunado
     public ResponseEntity<?> deletePatientCare(@PathVariable("patientCareId") Integer id) {
         patientCareService.deletePatienCare(id);

@@ -6,7 +6,9 @@ package com.vaccination.restapi.services;
 
 import com.vaccination.restapi.exception.ApiNoContentException;
 import com.vaccination.restapi.exception.ApiNotFoundException;
+import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.models.Patient;
+import com.vaccination.restapi.repository.PatientCareRepository;
 import com.vaccination.restapi.repository.PatientRepository;
 
 import java.util.List;
@@ -23,6 +25,9 @@ public class PatientService {
     
     @Autowired
     PatientRepository patientRepository;
+    
+    @Autowired
+    PatientCareRepository patientCareRepository;
     
     //Returns a list of patient from repository
     public List<Patient> getPatientsVaccinated() {
@@ -48,22 +53,30 @@ public class PatientService {
     }
     
     //Returns a update patient
-    public Patient updatePatient(Patient newPatient) {
-        if (patientRepository.existsById(newPatient.getId())) {
-            return patientRepository.save(newPatient);
+    public Patient updatePatient(Patient patient) {
+        if (patient.getId() != null) {
+            if (patientRepository.existsById(patient.getId())) {
+                return patientRepository.save(patient);
+            } else {
+                throw new ApiNotFoundException(
+                        "It does not exist the patient with id: " + patient.getId());
+            }
         } else {
-            throw new ApiNotFoundException(
-                    "It does not exist the patient with id: "+ newPatient.getId());
+            throw new ApiRequestException(
+                    "The given patient id must not be null");
         }
     }
     
     //Deletes the patient by id
     public void deletePatient(Integer id) {
         if (patientRepository.existsById(id)) {
+            if (patientCareRepository.existsByPatientId(id)) {
+                patientCareRepository.removePatientCaresByPatientId(id);
+            }
             patientRepository.deleteById(id);
         } else {
             throw new ApiNotFoundException(
                     "It does not exist the patient with id: "+ id);
-        }        
+        }
     }
 }

@@ -4,6 +4,8 @@
  */
 package com.vaccination.restapi.payload.response;
 
+import com.vaccination.restapi.dtos.FullVaccineDTO;
+import com.vaccination.restapi.dtos.PatientCareDTO;
 import com.vaccination.restapi.models.Patient;
 import com.vaccination.restapi.models.PatientCare;
 import com.vaccination.restapi.models.Vaccine;
@@ -16,8 +18,8 @@ public class MessageResponse {
     
     private String message;    
     private Patient patient;
-    private Vaccine vaccine;
-    private PatientCare patientCare;
+    private FullVaccineDTO vaccine;
+    private PatientCareDTO patientCare;
     
 
     public MessageResponse(String message) {
@@ -29,12 +31,12 @@ public class MessageResponse {
         this.patient = patient;
     }
     
-    public MessageResponse(String message, Vaccine vaccine) {
+    public MessageResponse(String message, FullVaccineDTO vaccine) {
         this.message = message;
         this.vaccine = vaccine;
     }
 
-    public MessageResponse(String message, PatientCare patientCare) {
+    public MessageResponse(String message, PatientCareDTO patientCare) {
         this.message = message;
         this.patientCare = patientCare;
     }
@@ -47,11 +49,11 @@ public class MessageResponse {
         this.message = message;
     }
 
-    public PatientCare getPatientCare() {
+    public PatientCareDTO getPatientCare() {
         return patientCare;
     }
 
-    public void setPatientCare(PatientCare patientCare) {
+    public void setPatientCare(PatientCareDTO patientCare) {
         this.patientCare = patientCare;
     }
 
@@ -63,11 +65,11 @@ public class MessageResponse {
         this.patient = patient;
     }
 
-    public Vaccine getVaccine() {
+    public FullVaccineDTO getVaccine() {
         return vaccine;
     }
 
-    public void setVaccine(Vaccine vaccine) {
+    public void setVaccine(FullVaccineDTO vaccine) {
         this.vaccine = vaccine;
     }
 }

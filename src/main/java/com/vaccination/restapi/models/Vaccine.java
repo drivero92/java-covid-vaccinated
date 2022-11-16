@@ -4,6 +4,7 @@
  */
 package com.vaccination.restapi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -13,14 +14,13 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 /**
  *
@@ -32,19 +32,19 @@ public class Vaccine {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vaccine_id")
+    @Column(name = "vaccine_id", unique = true)
     private Integer id;
     
-    @NotBlank(message = "Vaccine name should not be blank")
-    @NotEmpty(message = "The name of the vaccine must not be empty")
+    @NotBlank(message = "Vaccine name should not be blank.")
+    @NotEmpty(message = "The name of the vaccine must not be empty.")
     private String name;
 
-    @Positive(message = "The amount of the vaccine must be greater than zero")
-    @NotNull(message = "The amount of the vaccine must not be empty")
+    @PositiveOrZero(message = "The amount of the vaccine must be greater than zero.")
+    @NotNull(message = "The amount of the vaccine must not be empty.")
     private Integer quantity;
     
-    @Positive(message = "Vaccine rest days must be greater than zero")
-    @NotNull(message = "Vaccine rest days should not be empty")
+    @Positive(message = "Vaccine rest days must be greater than zero.")
+    @NotNull(message = "Vaccine rest days should not be empty.")
     private Short restDays;
     
     @Positive(message = "The number of doses to complete the vaccine must be greater than zero.")
@@ -55,9 +55,7 @@ public class Vaccine {
                 cascade = {CascadeType.MERGE, CascadeType.PERSIST}, 
                 fetch=FetchType.LAZY, 
                 mappedBy = "vaccines")
-//    @JoinTable( name = "compatible_vaccines",
-//                joinColumns = @JoinColumn(name = "vaccine_id", referencedColumnName = "vaccine_id"),
-//                inverseJoinColumns = @JoinColumn(name = "full_vaccine_id", referencedColumnName = "full_vaccine_id"))
+    @JsonBackReference
     private Set<FullVaccine> fullVaccines = new HashSet<>();
 
     public Vaccine() {
