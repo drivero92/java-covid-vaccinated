@@ -5,6 +5,7 @@
 package com.vaccination.restapi.repository;
 
 import com.vaccination.restapi.models.PatientCare;
+import java.time.LocalDate;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,17 @@ public interface PatientCareRepository extends JpaRepository<PatientCare, Intege
                     + "FROM patient_vaccine "
                     + "WHERE dose=:doses ", nativeQuery = true)
     List<PatientCare> findPCsByDose(@Param("doses") Byte dose);
+    
+    @Query(value =  "SELECT * "
+                    + "FROM patient_vaccine "
+                    + "WHERE (:id IS NULL OR vaccine_id=:id) "
+                    + "AND (:doses IS NULL OR dose=:doses) "
+                    + "AND (DATE(:doseDate) IS NULL OR dose_date=:doseDate) "
+                    + "ORDER BY patient_id ASC", nativeQuery = true)
+    List<PatientCare> findPCsByVaccineIdAndDoseAndDoseDate(
+            @Param("id") Integer id, 
+            @Param("doses") Byte dose,
+            @Param("doseDate") LocalDate doseDate);
     
     @Modifying(clearAutomatically = true)
     @Transactional

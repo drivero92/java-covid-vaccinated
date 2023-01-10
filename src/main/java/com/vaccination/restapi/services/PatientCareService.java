@@ -10,16 +10,11 @@ import com.vaccination.restapi.exception.ApiNoContentException;
 import com.vaccination.restapi.exception.ApiNotFoundException;
 import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.mappers.PatientCareConverter;
-import com.vaccination.restapi.mappers.VaccineConverter;
-import com.vaccination.restapi.models.FullVaccine;
-import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.repository.PatientCareRepository;
 import com.vaccination.restapi.models.PatientCare;
-import com.vaccination.restapi.payload.response.MessageResponse;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -46,14 +41,6 @@ public class PatientCareService{
     private PatientCareConverter patientCareConverter;
     
     //Returns a patients care list from repository
-//    public List<PatientCare> getPatientCares() {
-//        List<PatientCare> _patientCareList = patientCareRepository.findAll();
-//        if (_patientCareList.isEmpty()) {
-//            throw new ApiNoContentException("The patient care list has no content");
-//        } else {
-//            return _patientCareList;
-//        }
-//    }
     public List<PatientCareDTO> getPatientCares() {
         List<PatientCare> _patientCares = patientCareRepository.findAll();
         if (_patientCares.isEmpty()) {
@@ -64,11 +51,6 @@ public class PatientCareService{
     }
     
     //Returns a patient care by id from repository
-//    public PatientCare getPatientCare(Integer id) {
-//        return patientCareRepository.findById(id)
-//                .orElseThrow(() -> new ApiNotFoundException(
-//                        "The patient care id: "+id+" is not found"));
-//    }
     public PatientCareDTO getPatientCare(Integer id) {
         PatientCare _patientCare = patientCareRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException(
@@ -77,15 +59,6 @@ public class PatientCareService{
     }
     
     //Returns a list of patient cares (PCs) by the patient id and the doses
-//    public List<PatientCare> getPCsByPatientId(Integer id) {
-//        List<PatientCare> _patientCare = patientCareRepository.findPCsByPatientId(id);
-//        if (_patientCare.isEmpty()) {
-//            throw new ApiNoContentException(
-//                    "The list of patient cares of the patient id: "+ id +" has no content");
-//        } else {
-//            return _patientCare;
-//        }
-//    }
     public List<PatientCareDTO> getPCsByPatientId(Integer id) {
         List<PatientCare> _patientCare = patientCareRepository.findPCsByPatientId(id);
         if (_patientCare.isEmpty()) {
@@ -117,6 +90,17 @@ public class PatientCareService{
     //Returns a list of vaccines that have the same number of Doses
     public List<PatientCareDTO> getPCsByDose(Byte dose) {
         List<PatientCare> _patientCare = patientCareRepository.findPCsByDose(dose);
+        if (_patientCare.isEmpty()) {
+            throw new ApiNoContentException(
+                    "It does not exist the patient cares list with dose: "+ dose);
+        } else {
+            return patientCareConverter.entitiesToDTOs(_patientCare);
+        }
+    }
+    
+    //Returns a list of vaccines that have the same number of Doses
+    public List<PatientCareDTO> getPCsByVaccineIdAndDoseAndDoseDate(Integer id, Byte dose, LocalDate doseDate) {
+        List<PatientCare> _patientCare = patientCareRepository.findPCsByVaccineIdAndDoseAndDoseDate(id, dose, doseDate);
         if (_patientCare.isEmpty()) {
             throw new ApiNoContentException(
                     "It does not exist the patient cares list with dose: "+ dose);

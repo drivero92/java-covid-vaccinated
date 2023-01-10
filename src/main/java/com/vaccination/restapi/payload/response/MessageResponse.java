@@ -7,8 +7,6 @@ package com.vaccination.restapi.payload.response;
 import com.vaccination.restapi.dtos.FullVaccineDTO;
 import com.vaccination.restapi.dtos.PatientCareDTO;
 import com.vaccination.restapi.models.Patient;
-import com.vaccination.restapi.models.PatientCare;
-import com.vaccination.restapi.models.Vaccine;
 
 /**
  *

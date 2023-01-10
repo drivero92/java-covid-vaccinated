@@ -37,12 +37,7 @@ public class FullVaccineController {
     @Autowired
     FullVaccineService fullVaccineService;
     
-    //Returns a full vaccine list
-//    @GetMapping("/list")
-//    public ResponseEntity<List<FullVaccine>> getFullVaccines() {
-//        List<FullVaccine> _fullVaccine = fullVaccineService.getFullVaccines();
-//        return new ResponseEntity<>(_fullVaccine, HttpStatus.OK);
-//    }    
+    //Returns a full vaccine list   
     @GetMapping("/list")
     public ResponseEntity<List<FullVaccineDTO>> getFullVaccines() {
         List<FullVaccineDTO> _fullVaccinesDTO = fullVaccineService.getFullVaccines();
@@ -56,12 +51,7 @@ public class FullVaccineController {
         return new ResponseEntity<>(_fullVaccineDTO,HttpStatus.OK);
     }
     
-    //Returns a compatible vaccines of a vaccine from service
-//    @GetMapping("/get_vaccines/{id}")
-//    public ResponseEntity<Collection<Vaccine>> getVaccineList(@PathVariable Integer id) {
-//        FullVaccine _fullVaccine = fullVaccineService.getFullVaccine(id);        
-//        return new ResponseEntity<>(_fullVaccine.getVaccines(),HttpStatus.OK);
-//    }    
+    //Returns a compatible vaccines of a vaccine from service  
     @GetMapping("/{id}/vaccines")
     public ResponseEntity<Collection<Vaccine>> getVaccineList(@PathVariable Integer id) {
         FullVaccineDTO _fullVaccineDTO = fullVaccineService.getFullVaccine(id);        
@@ -75,12 +65,6 @@ public class FullVaccineController {
     }
     
     //Adds a new full vaccine
-//    @PostMapping("/save")
-//    public ResponseEntity<?> addFullVaccine(@RequestBody FullVaccine fullVaccine) {
-//        FullVaccine _fullVaccine = fullVaccineService.addFullVaccine(fullVaccine);
-//        return ResponseEntity.ok(new MessageResponse(
-//            "Vaccine was successfully added"));
-//    }
     @PostMapping()
     public ResponseEntity<?> addFullVaccine(@RequestBody FullVaccineDTO fullVaccineDTO) {
         FullVaccine _fullVaccine = fullVaccineService.addFullVaccine(fullVaccineDTO);

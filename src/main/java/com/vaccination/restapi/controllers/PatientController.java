@@ -7,8 +7,8 @@ package com.vaccination.restapi.controllers;
 import com.vaccination.restapi.services.PatientService;
 import com.vaccination.restapi.models.Patient;
 import com.vaccination.restapi.payload.response.MessageResponse;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 

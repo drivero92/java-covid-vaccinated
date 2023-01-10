@@ -4,15 +4,13 @@
  */
 package com.vaccination.restapi.controllers;
 
-import com.vaccination.restapi.dtos.FullVaccineDTO;
-import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.models.FullVaccine;
 import com.vaccination.restapi.payload.response.MessageResponse;
 import com.vaccination.restapi.services.VaccineService;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
 import java.util.List;
 import javax.validation.Valid;
 
@@ -56,11 +54,6 @@ public class VaccineController {
         Vaccine _vaccine = vaccineService.getVaccine(id);
         return new ResponseEntity<>(_vaccine, HttpStatus.OK);
     }
-//    @GetMapping("/{id}")
-//    public ResponseEntity<CombinolaVaccine> getVaccineById(@PathVariable Integer id) {
-//        FullVaccineDTO _vaccine = vaccineService.getVaccine(id);
-//        return new ResponseEntity<>(_vaccine, HttpStatus.OK);
-//    }
     
     //Returns a vaccine from service
     @GetMapping("/full_vaccines/{id}")
@@ -98,8 +91,6 @@ public class VaccineController {
             return ResponseEntity.badRequest().body(new MessageResponse(String.format("%s", _errors)));
         } else {
             Vaccine _vaccine = vaccineService.updateVaccine(vaccine);
-//            return ResponseEntity.ok(new MessageResponse(
-//                    "Vaccine was successfully updated", _vaccine));
             return new ResponseEntity<>(_vaccine, HttpStatus.OK);
         }
     }

@@ -4,14 +4,11 @@
  */
 package com.vaccination.restapi.services;
 
-import com.vaccination.restapi.dtos.FullVaccineDTO;
 import com.vaccination.restapi.exception.ApiNoContentException;
 import com.vaccination.restapi.exception.ApiNotFoundException;
 import com.vaccination.restapi.exception.ApiRequestException;
-import com.vaccination.restapi.mappers.VaccineConverter;
 import com.vaccination.restapi.models.Vaccine;
 import com.vaccination.restapi.repository.VaccineRepository;
-import java.sql.SQLException;
 
 import java.util.List;
 

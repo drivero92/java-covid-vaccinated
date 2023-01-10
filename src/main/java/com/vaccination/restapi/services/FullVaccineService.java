@@ -11,16 +11,18 @@ import com.vaccination.restapi.exception.ApiRequestException;
 import com.vaccination.restapi.mappers.VaccineConverter;
 import com.vaccination.restapi.models.FullVaccine;
 import com.vaccination.restapi.models.Vaccine;
+
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.vaccination.restapi.repository.FullVaccineRepository;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.vaccination.restapi.repository.FullVaccineRepository;
 
 /**
  *
@@ -45,10 +47,7 @@ public class FullVaccineService {
     FullVaccineService (VaccineConverter vaccineConverter) {
         this.vaccineConverter = vaccineConverter;
     }
-
-//    public List<FullVaccine> getFullVaccines() {
-//        return fullVaccineRepository.findAll();
-//    }    
+  
     public List<FullVaccineDTO> getFullVaccines() {
         List<FullVaccine> _fullVaccines = fullVaccineRepository.findAll();
         if (_fullVaccines.isEmpty()) {
@@ -58,10 +57,7 @@ public class FullVaccineService {
             return vaccineConverter.entitiesToDTOs(_fullVaccines);
         }
     }
-
-//    public FullVaccine getFullVaccine(Integer id) {
-//        return fullVaccineRepository.findById(id).get();
-//    }    
+   
     public FullVaccineDTO getFullVaccine(Integer id) {
         FullVaccine _fullVaccine = fullVaccineRepository.findById(id)
                                                         .orElseThrow(() -> new ApiNotFoundException(
@@ -169,7 +165,6 @@ public class FullVaccineService {
     }
     
     public boolean compatibleVaccines(Integer vaccineId1, FullVaccineDTO fullVaccineDTO2) {
-//        boolean resp = false;
         if (fullVaccineDTO2.getVaccines().isEmpty()) {
             throw new ApiNotFoundException("There are no compatible vaccines");
         } else {
